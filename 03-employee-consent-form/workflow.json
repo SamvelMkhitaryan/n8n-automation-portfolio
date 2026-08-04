@@ -1,0 +1,1057 @@
+{
+  "name": "MPLOYEE & CONTRACTOR PHOTO & VIDEO CONSENT FORM",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "2a842971-6a85-467c-ae38-ddc48bf87372",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -96,
+        0
+      ],
+      "id": "019db1e5-83a4-4b91-b196-ddb062431776",
+      "name": "Webhook",
+      "webhookId": "REDACTED"
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "id"
+        },
+        "name": "=Photo_Video_Consent_Employees_Contractors {{ $('Get row(s) in sheet').first().json['Full Name'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        640,
+        0
+      ],
+      "id": "ad165ab7-11e1-4175-a150-f3ca7ff92d46",
+      "name": "Copy file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "{{eventName}}",
+              "replaceText": "={{ $('Code in JavaScript').first().json.eventName }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{eventDate}} ",
+              "replaceText": "={{ $('Code in JavaScript').first().json.eventDate }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{eventLocation}}",
+              "replaceText": "={{ $('Code in JavaScript').first().json.eventLocation }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{employeeName}} ",
+              "replaceText": "={{ $('Get row(s) in sheet').first().json['Full Name'] }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{officeInfo}}",
+              "replaceText": "={{ $('Map Office').first().json.officeInfo }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{type}}",
+              "replaceText": "={{ $('Map Office').first().json.Type }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{positionrole}}",
+              "replaceText": "={{ $('Map Office').first().json['Position/Role'] }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{employer}}",
+              "replaceText": "={{ $('Map Office').first().json.legalName }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{address}}",
+              "replaceText": "={{ $('Map Office').first().json.legalAddress }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{currentDate}}",
+              "replaceText": "={{ $now.toFormat('dd.MM.yyyy') }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{otherCountries}}",
+              "replaceText": "={{ $('Map Office').first().json.otherCountries }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        768,
+        0
+      ],
+      "id": "7e0850b1-0c49-46e3-894b-f3ad90622940",
+      "name": "Update a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "reader",
+            "type": "user",
+            "emailAddress": "={{ $('Get row(s) in sheet').item.json.Email }}"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        896,
+        0
+      ],
+      "id": "f0033e77-ff61-4bf9-9955-1f5fa9c2a6e5",
+      "name": "Share file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://slack.com/api/chat.postMessage",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "slackApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"channel\": \"{{ $('Webhook').first().json.body.user_id }}\",\n  \"text\": \"👀 Review Consent Form Draft\",\n  \"blocks\": [\n    {\n      \"type\": \"header\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"👀 Review Consent Draft\",\n        \"emoji\": true\n      }\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"Draft generated for *{{ $('Code in JavaScript').first().json.employeeName }}*.\\n\\n▶️ *Please review the document here:* <https://docs.google.com/document/d/{{ $('Copy file').first().json.id }}/edit|Open Document>\"\n      }\n    },\n    {\n      \"type\": \"actions\",\n      \"elements\": [\n        {\n          \"type\": \"button\",\n          \"text\": {\n            \"type\": \"plain_text\",\n            \"text\": \"✅ Send to Employee\",\n            \"emoji\": true\n          },\n          \"style\": \"primary\",\n          \"value\": \"{{ $('Copy file').first().json.id }}|{{ $('Get row(s) in sheet').first().json['Email'] }}|{{ $('Code in JavaScript').first().json.employeeName }}|{{ $('Code in JavaScript').first().json.eventName }}|{{ $('Code in JavaScript').first().json.eventDate }}\",\n          \"action_id\": \"hr_send\"\n        },\n        {\n          \"type\": \"button\",\n          \"text\": {\n            \"type\": \"plain_text\",\n            \"text\": \"❌ Cancel\",\n            \"emoji\": true\n          },\n          \"style\": \"danger\",\n          \"value\": \"cancel\",\n          \"action_id\": \"hr_cancel\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1184,
+        0
+      ],
+      "id": "4aeedb9e-0146-48d9-abc4-3742b912b585",
+      "name": "HTTP Request",
+      "credentials": {
+        "slackApi": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the raw text from the Webhook\nconst rawText = $('Webhook').item.json.body.text;\n\n// Get the requestor's Slack username and build their email\nconst requestorUsername = $('Webhook').item.json.body.user_name;\nconst requestorEmail = `${requestorUsername}@example.com`;\n\n// Split by comma and clean up extra spaces\nconst parts = rawText.split(',').map(part => part.trim());\n\n// Smart function: Converts any text to Title Case (e.g., \"yerevan\" -> \"Yerevan\")\nfunction formatText(text) {\n  if (!text) return 'Unknown';\n  return text.split(' ')\n             .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())\n             .join(' ');\n}\n\n// Map everything to clean keys\nreturn [{\n  json: {\n    employeeName: formatText(parts[0]),\n    eventName: parts[1] || 'Unknown',\n    eventDate: parts[2] || 'Unknown',\n    eventLocation: formatText(parts[3]),\n    requestorEmail: requestorEmail\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        0
+      ],
+      "id": "82582a4f-c0cd-4766-b10c-121898e2ad06",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Look up the employee's office/legal entity by their Employer code and\n// build the address block that is injected into the consent document.\n// NOTE: the full company directory (legal names + registered addresses)\n// is redacted here for confidentiality.\nconst employeeData = $input.item.json;\nconst employerCode = (employeeData['Employer'] || '').trim().toUpperCase();\nconst allCompanies = [ /* redacted: entities keyed by code, e.g. { id, legalName, legalAddress, country, info } */ ];\nconst match = allCompanies.find(c => c.id === employerCode) || {};\nreturn [{ json: { officeInfo: match.info || '', country: match.country || '', legalAddress: match.legalAddress || '' } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        0
+      ],
+      "id": "e9000d23-c3da-425d-a573-777e89e33b7b",
+      "name": "Map Office"
+    },
+    {
+      "parameters": {
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "acme Name",
+              "lookupValue": "={{ $('Code in JavaScript').first().json.employeeName }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        512,
+        0
+      ],
+      "id": "c7b77fde-78c7-4693-8dfb-e7c5cea98884",
+      "name": "Get Address",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Full Name",
+              "lookupValue": "={{ $('Code in JavaScript').first().json.employeeName }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        256,
+        0
+      ],
+      "id": "e9e55177-baf8-4f22-a83c-1599fd3e1e31",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "slack-button",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -144,
+        336
+      ],
+      "id": "2013003c-922b-405f-85db-9dfa55349aaf",
+      "name": "Webhook1",
+      "webhookId": "REDACTED"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = JSON.parse($input.item.json.body.payload);\nconst actionId = payload.actions[0].action_id;\nconst value = payload.actions[0].value || \"\";\n\nlet docId = null;\nlet email = null;\nlet empName = payload.user.name;\nlet hrChannel = null;\nlet eventName = \"Unknown Event\";\nlet eventDate = \"Unknown Date\";\n\n// По умолчанию ставим крестик (если сотрудник НЕ выбрал пункт)\nlet checkA = \"☒\";\nlet checkB = \"☒\";\nlet checkC = \"☒\";\n\n// Если нажал HR\nif (actionId === \"hr_send\") {\n  const parts = value.split(\"|\");\n  docId = parts[0];\n  email = parts[1];\n  empName = parts[2];\n  eventName = parts[3] || \"Unknown Event\"; \n  eventDate = parts[4] || \"Unknown Date\";  \n  hrChannel = payload.channel.id;\n} \nelse if (actionId === \"hr_cancel\") {\n  hrChannel = payload.channel.id;\n}\n// Если нажал сотрудник (кнопки Accept или Decline)\nelse if (actionId === \"consent_accept\" || actionId === \"consent_decline\") {\n  const blocksText = JSON.stringify(payload.message.blocks);\n  const match = blocksText.match(/\\/d\\/([a-zA-Z0-9-_]{44})/);\n  docId = match ? match[1] : null;\n  \n  const empParts = value.split(\"|\");\n  hrChannel = empParts[0]; \n  email = empParts[1];     \n  eventName = empParts[2] || \"Unknown Event\"; \n  eventDate = empParts[3] || \"Unknown Date\";  \n\n  // Читаем чекбоксы только при принятии документа\n  if (actionId === \"consent_accept\") {\n    try {\n      // Ищем, какие галочки стояли в момент нажатия кнопки Accept\n      const options = payload.state.values.consent_checkboxes.permissions_list.selected_options;\n      const selected = options.map(opt => opt.value);\n      \n      // Если пункт выбран в Slack, меняем крестик на птичку!\n      if (selected.includes(\"A\")) checkA = \"☑\";\n      if (selected.includes(\"B\")) checkB = \"☑\";\n      if (selected.includes(\"C\")) checkC = \"☑\";\n    } catch(e) {}\n  }\n}\n\n// Делаем имя красивым (с большой буквы, убираем точки)\nempName = empName.replace(/[\\._-]/g, ' ').replace(/\\b\\w/g, c => c.toUpperCase());\n\nreturn {\n  json: {\n    decision: actionId,\n    documentId: docId,\n    employeeEmail: email,\n    employeeName: empName,\n    eventName: eventName,\n    eventDate: eventDate,\n    hrChannelId: hrChannel,\n    channelId: payload.channel.id,\n    checkA: checkA,\n    checkB: checkB,\n    checkC: checkC\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        336
+      ],
+      "id": "8e055ae3-e61c-4a65-8a29-5f871977cee8",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://slack.com/api/chat.postMessage",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "slackApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"channel\": \"{{ $('Code in JavaScript1').first().json.hrChannelId }}\",\n  \"text\": \"✅ Consent Form Signed\",\n  \"blocks\": [\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"✅ *{{ $('Code in JavaScript1').first().json.employeeName }}* has signed the document.\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1216,
+        560
+      ],
+      "id": "4ce0e5ed-29ea-4e0f-8f74-949f37617c22",
+      "name": "Notify HR - Success",
+      "credentials": {
+        "slackApi": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://slack.com/api/chat.postMessage",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "slackApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"channel\": \"{{ $('Code in JavaScript1').first().json.hrChannelId }}\",\n  \"text\": \"❌ Consent Form Declined\",\n  \"blocks\": [\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"❌ *{{ $('Code in JavaScript1').first().json.employeeName }}* has declined the document.\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        624,
+        736
+      ],
+      "id": "f88b297f-5ec4-4a2f-a380-5f5f5a996a25",
+      "name": "Notify HR - Declined",
+      "credentials": {
+        "slackApi": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "hr_send",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ccfee433-2837-48d1-83a2-ed56fc062bd8"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5c6d4c71-7e84-49cb-83bb-3ae69197fdf6",
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "hr_cancel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f7cb5695-10fd-4865-8715-b2f73b342cf4",
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "consent_accept",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "76622acd-a9a9-4152-be27-99d2b25aa167",
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "consent_decline",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        304
+      ],
+      "id": "03d1724f-4094-4553-b9d9-f098b54ea153",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "url": "https://slack.com/api/users.lookupByEmail",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "slackApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "email",
+              "value": "={{ $('Code in JavaScript1').first().json.employeeEmail }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        624,
+        208
+      ],
+      "id": "1553c681-b1f0-4a3b-b046-a35e2cac1f53",
+      "name": "Find User by Email",
+      "credentials": {
+        "slackApi": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://slack.com/api/chat.postMessage",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "slackApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"channel\": \"{{ $json.user.id }}\",\n  \"text\": \"Please review and sign your consent form\",\n  \"blocks\": [\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"Hello! Please review your Photo & Video Consent Form.\\n\\n▶️ *Document:* <https://docs.google.com/document/d/{{ $('Code in JavaScript1').first().json.documentId }}/edit|Review Document>\\n\\n*Please select your permissions below before clicking Accept & Sign:*\"\n      }\n    },\n    {\n      \"type\": \"actions\",\n      \"block_id\": \"consent_checkboxes\",\n      \"elements\": [\n        {\n          \"type\": \"checkboxes\",\n          \"action_id\": \"permissions_list\",\n          \"options\": [\n            {\n              \"text\": { \"type\": \"mrkdwn\", \"text\": \"A. External Marketing & Communications\" },\n              \"value\": \"A\"\n            },\n            {\n              \"text\": { \"type\": \"mrkdwn\", \"text\": \"B. Recruitment & employer-branding\" },\n              \"value\": \"B\"\n            },\n            {\n              \"text\": { \"type\": \"mrkdwn\", \"text\": \"C. Name and Title\" },\n              \"value\": \"C\"\n            }\n          ]\n        }\n      ]\n    },\n    {\n      \"type\": \"actions\",\n      \"block_id\": \"submit_buttons\",\n      \"elements\": [\n        {\n          \"type\": \"button\",\n          \"text\": { \"type\": \"plain_text\", \"text\": \"✅ Accept & Sign\" },\n          \"style\": \"primary\",\n          \"value\": \"{{ $('Code in JavaScript1').first().json.channelId }}|{{ $('Code in JavaScript1').first().json.employeeEmail }}|{{ $('Code in JavaScript1').first().json.eventName }}|{{ $('Code in JavaScript1').first().json.eventDate }}\",\n          \"action_id\": \"consent_accept\"\n        },\n        {\n          \"type\": \"button\",\n          \"text\": { \"type\": \"plain_text\", \"text\": \"❌ Decline\" },\n          \"style\": \"danger\",\n          \"value\": \"{{ $('Code in JavaScript1').first().json.channelId }}|{{ $('Code in JavaScript1').first().json.employeeEmail }}|{{ $('Code in JavaScript1').first().json.eventName }}|{{ $('Code in JavaScript1').first().json.eventDate }}\",\n          \"action_id\": \"consent_decline\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        784,
+        208
+      ],
+      "id": "fc0111a3-1030-48c9-9b88-fb4979681874",
+      "name": "Send to Employee",
+      "credentials": {
+        "slackApi": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://slack.com/api/chat.postMessage",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "slackApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"channel\": \"{{ $('Code in JavaScript1').first().json.channelId }}\",\n  \"text\": \"Draft Canceled\",\n  \"blocks\": [\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"🚫 *Draft Canceled:* You have canceled the request for *{{ $('Code in JavaScript1').first().json.employeeName }}*. No message was sent to the employee.\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        624,
+        384
+      ],
+      "id": "f7aae641-3e7f-455e-9eed-76c9befce8b9",
+      "name": "Notify HR - Canceled",
+      "credentials": {
+        "slackApi": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "reader",
+            "type": "user",
+            "emailAddress": "={{ $('Switch').item.json.employeeEmail }}"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1088,
+        560
+      ],
+      "id": "1c2f9d38-1aa3-4a20-bfc4-cab406d5e78a",
+      "name": "Share file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Event Name": "={{ $('Code in JavaScript1').first().json.eventName }}",
+            "Event Date": "={{ $('Code in JavaScript1').first().json.eventDate }}",
+            "Employee Name": "={{ $('Code in JavaScript1').first().json.employeeName }}",
+            "Email": "REDACTED",
+            "Document Link": "=https://docs.google.com/document/d/{{ $('Code in JavaScript1').first().json.documentId }}/edit",
+            "Date & Time": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Employee Name",
+              "displayName": "Employee Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Document Link",
+              "displayName": "Document Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date & Time",
+              "displayName": "Date & Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Event Name",
+              "displayName": "Event Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Event Date",
+              "displayName": "Event Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1344,
+        560
+      ],
+      "id": "c8c24650-00ee-4d01-a950-76e9a4cf8d4d",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $now.toFormat('yyyy-MM-dd') }} - {{ $('Code in JavaScript1').first().json.employeeName }} - Summer Party 2026.pdf",
+        "driveId": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "id"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        944,
+        560
+      ],
+      "id": "2c76daca-794a-41f3-9162-5daa57feffb0",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "application/pdf",
+              "drawingsToFormat": "application/pdf",
+              "slidesToFormat": "application/pdf",
+              "sheetsToFormat": "application/pdf"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        800,
+        560
+      ],
+      "id": "ee175bb1-693f-4a7b-8aa7-b396cd670930",
+      "name": "Download file",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "retryOnFail": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "writer",
+            "type": "user",
+            "emailAddress": "={{ $('Code in JavaScript').item.json.requestorEmail }}"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "9b9a718b-cc73-40e4-9089-4ec92b340d0d",
+      "name": "Share file2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.documentId }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "{{checkA}}",
+              "replaceText": "={{ $json.checkA }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{checkB}}",
+              "replaceText": "={{ $json.checkB }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{checkC}}",
+              "replaceText": "={{ $json.checkC }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        624,
+        560
+      ],
+      "id": "c55c273d-3d09-4000-a46c-96f444b232c7",
+      "name": "Add Checkmarks",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file": {
+      "main": [
+        [
+          {
+            "node": "Update a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a document": {
+      "main": [
+        [
+          {
+            "node": "Share file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share file": {
+      "main": [
+        [
+          {
+            "node": "Share file2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Office": {
+      "main": [
+        [
+          {
+            "node": "Get Address",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Address": {
+      "main": [
+        [
+          {
+            "node": "Copy file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Map Office",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify HR - Success": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Find User by Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notify HR - Canceled",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Checkmarks",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notify HR - Declined",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find User by Email": {
+      "main": [
+        [
+          {
+            "node": "Send to Employee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share file1": {
+      "main": [
+        [
+          {
+            "node": "Notify HR - Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Share file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share file2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Checkmarks": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "REDACTED",
+    "callerPolicy": "workflowsFromSameOwner"
+  }
+}

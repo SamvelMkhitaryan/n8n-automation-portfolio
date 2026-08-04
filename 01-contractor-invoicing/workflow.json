@@ -1,0 +1,1183 @@
+{
+  "name": "Bill Payment Automated Invoices (Contractor invoice)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "edb11b8a-c74a-4cb3-aae2-205e5412d0bf",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        336,
+        336
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/drive/v3/files/REDACTED_FILE_ID/copy",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDocsOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $('Postgres').item.json.full_name }} Invoice\"\n} ",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1
+            }
+          }
+        }
+      },
+      "id": "6f5345d9-b800-4a99-89f4-ebde83dbe04e",
+      "name": "Copy Template File",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3392,
+        368
+      ],
+      "executeOnce": false,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $('Postgres').item.json.eop }}",
+        "format": "yyyy-MM-dd",
+        "outputFieldName": "invMonth",
+        "options": {}
+      },
+      "id": "e4c4cbf1-9777-45c8-9a1a-5563664e0acf",
+      "name": "invMonth",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        2912,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Document ID": "={{ $json.documentId }}",
+            "Document Name": "={{ $('Copy Template File').item.json.name }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Document Name",
+              "displayName": "Document Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Document ID",
+              "displayName": "Document ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "41c7c7e5-96d5-461b-8876-2ee724affba3",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        4000,
+        608
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initialize an array to store the results\nconst results = [];\n\n// Loop through all items\nfor (const item of items) {\n    // Get the current date\n    const currentDate = new Date();\n\n    // Subtract one month\n    currentDate.setMonth(currentDate.getMonth() - 1);\n\n    // Get the month and year\n    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based\n    const year = currentDate.getFullYear().toString().slice(-2); // Get last two digits of the year\n\n    // Format the date as mmyy\n    const formattedDate = `${month}${year}`;\n\n    // Get the first day of the previous month\n    const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);\n    const firstDayFormatted = `${firstDay.getDate().toString().padStart(2, '0')}/${(firstDay.getMonth() + 1).toString().padStart(2, '0')}/${firstDay.getFullYear()}`;\n\n    // Get the last day of the previous month\n    const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);\n    const lastDayFormatted = `${lastDay.getDate().toString().padStart(2, '0')}/${(lastDay.getMonth() + 1).toString().padStart(2, '0')}/${lastDay.getFullYear()}`;\n\n    // Format the range as dd/mm/yyyy - dd/mm/yyyy\n    const dateRange = `${firstDayFormatted} - ${lastDayFormatted}`;\n\n    // Push the result for this item into the results array\n    results.push({\n        json: {\n            invNumber: formattedDate,\n            Period: dateRange,\n            ...item.json // Keep any other data from the original item if needed\n        }\n    });\n}\n\n// Return all results\nreturn results;\n"
+      },
+      "id": "3cd6bad0-000c-44bf-a8fd-dd2a3ec5d1e1",
+      "name": "Create Inv Number",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3072,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Username",
+              "lookupValue": "={{ $('Postgres').item.json.full_name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "42b29b3a-4272-4b72-90fd-b91c2db83d5b",
+      "name": "Get Jira ID",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        2752,
+        368
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const col8Mapping = [\n    { \"id\": \"1\", \"label\": \"acme US\" },\n    { \"id\": \"2\", \"label\": \"acme CA\" },\n    { \"id\": \"3\", \"label\": \"acme CZ\" },\n    { \"id\": \"4\", \"label\": \"acme PL\" },\n    { \"id\": \"5\", \"label\": \"acme RS\" },\n    { \"id\": \"6\", \"label\": \"acme DE\" },\n    { \"id\": \"7\", \"label\": \"External\" }\n];\n\nconst col24Mapping = [\n    { \"id\": \"1\", \"label\": \"USD\" },\n    { \"id\": \"2\", \"label\": \"EUR\" },\n    { \"id\": \"3\", \"label\": \"CAD\" },\n    { \"id\": \"4\", \"label\": \"CZK\" },\n    { \"id\": \"5\", \"label\": \"RSD\" },\n    { \"id\": \"6\", \"label\": \"PLN\" },\n    { \"id\": \"7\", \"label\": \"GBP\" },\n    { \"id\": \"0\", \"label\": \"Other...\" }\n];\n\nconst addressMapping = {}; // redacted: registered addresses\n\nconst legalNameMapping = {}; // redacted: legal entity names\n\nconst col8Map = new Map(col8Mapping.map(item => [item.label, item.id]));\nconst col24Map = new Map(col24Mapping.map(item => [item.label, item.id]));\n\nreturn items.map(item => {\n    if (item.json.employer && col8Map.has(item.json.employer)) {\n        item.json.col_8_id = col8Map.get(item.json.employer);\n        item.json.address = addressMapping[item.json.employer];\n        item.json.legal_name = legalNameMapping[item.json.employer];\n    }\n\n    if (item.json.curr_inv) {\n        item.json.col_24_id = col24Map.has(item.json.curr_inv) ? col24Map.get(item.json.curr_inv) : '0';\n    }\n\n    return item;\n});\n"
+      },
+      "id": "0696d70b-ffdb-40e9-b85f-0a2ef837bb18",
+      "name": "Map Payer and Currency",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2288,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "col_2",
+              "lookupValue": "={{ $json.full_name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6242e7f9-d5ba-48b8-965d-657568fe544d",
+      "name": "Get Payer Rate And Currency",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2464,
+        368
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fromEmail": "REDACTED",
+        "toEmail": "REDACTED",
+        "subject": "Action required: For contractors providing monthly services",
+        "html": "=Dear {{ $('Postgres').item.json.full_name }},\n\n<p><b>The draft invoice for your regular services</b> last month has been automatically created. Please follow the steps below:</p>\n\n<p><b>Action Required:</b></p>\n<ol>\n  <li><b>Review the draft invoice.</b></li>\n  <li><b>Make any necessary corrections</b> directly in the invoice if the hours or amounts differ from your logs (e.x. exclude Unpaid leave hours).</li>\n  <li><b>Create a Jira request</b> to notify the team that your invoice is ready.</li>\n  <li><b>Upload the finalized invoice</b> (or your own adjusted draft) by the 5th of this month.</li>\n</ol>\n\n<p>If you have any questions or need assistance, please let us know.</p>\n\n<p><b>Invoice:</b> https://docs.google.com/document/d/{{ $json.documentId }}</p>\n",
+        "options": {
+          "appendAttribution": false,
+          "ccEmail": "REDACTED",
+          "bccEmail": "REDACTED"
+        }
+      },
+      "id": "712d2f7b-6464-4752-8eb8-0bbae45801ed",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        4272,
+        -48
+      ],
+      "webhookId": "REDACTED",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "smtp": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "a208613e-e7d2-4a18-ae46-42055ed57330",
+              "leftValue": "={{ $json.full_name }}",
+              "rightValue": "Redacted Person",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "2677fc15-8fa6-4f48-8a85-38d5dd5040c1",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        384
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://docs.googleapis.com/v1/documents/{{ $json.id }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDocsOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"requests\": [\n    {\n      \"replaceAllText\": {\n        \"containsText\": {\n          \"text\": \"Beneficiary\",\n          \"matchCase\": true\n        },\n        \"replaceText\": \"{{ $('Postgres').item.json.name_contract }}\"\n      }\n    },\n    {\n      \"replaceAllText\": {\n        \"containsText\": {\n          \"text\": \"TotalHours\",\n          \"matchCase\": true\n        },\n        \"replaceText\": \"{{ $('Postgres').item.json.fact_hours }}\"\n      }\n    },\n    {\n      \"replaceAllText\": {\n        \"containsText\": {\n          \"text\": \"word\",\n          \"matchCase\": true\n        },\n        \"replaceText\": \"{{ $('Postgres').item.json.work_order }}\"\n      }\n    },\n    {\n      \"replaceAllText\": {\n        \"containsText\": {\n          \"text\": \"wodate\",\n          \"matchCase\": true\n        },\n        \"replaceText\": \"{{ $('Postgres').item.json.work_order_date }}\"\n      }\n    },\n    {\n      \"replaceAllText\": {\n        \"containsText\": {\n          \"text\": \"Number\",\n          \"matchCase\": true\n        },\n        \"replaceText\": \"{{ $('Create Inv Number').item.json.invNumber }}\"\n      }\n    },\n    {\n      \"replaceAllText\": {\n        \"containsText\": {\n          \"text\": \"HRate\",\n          \"matchCase\": true\n        },\n        \"replaceText\": \"{{ $('Postgres').item.json.rate_numeric }}\"\n      }\n    },\n    {\n      \"replaceAllText\": {\n        \"containsText\": {\n          \"text\": \"Speriod\",\n          \"matchCase\": true\n        },\n        \"replaceText\": \"{{ $('Create Inv Number').item.json.Period }}\"\n      }\n    },\n    {\n      \"replaceAllText\": {\n        \"containsText\": {\n          \"text\": \"invDate\",\n          \"matchCase\": true\n        },\n        \"replaceText\": \"{{ $('invMonth').item.json.invMonth }}\"\n      }\n    },\n    {\n      \"replaceAllText\": {\n        \"containsText\": {\n          \"text\": \"PayerAddress\",\n          \"matchCase\": true\n        },\n        \"replaceText\": \"{{ $('Map Payer and Currency').item.json.address }}\"\n      }\n    },\n    {\n      \"replaceAllText\": {\n        \"containsText\": {\n          \"text\": \"Legalname\",\n          \"matchCase\": true\n        },\n        \"replaceText\": \"{{ $('Map Payer and Currency').item.json.legal_name }}\"\n      }\n    },\n    {\n      \"replaceAllText\": {\n        \"containsText\": {\n          \"text\": \"Address\",\n          \"matchCase\": true\n        },\n        \"replaceText\": \"{{ $('Postgres').item.json.legal_address }}\"\n      }\n    },\n    {\n      \"replaceAllText\": {\n        \"containsText\": {\n          \"text\": \"rate_curr\",\n          \"matchCase\": true\n        },\n        \"replaceText\": \"{{ $('Postgres').item.json.curr_rate }}\"\n      }\n    },\n    {\n      \"replaceAllText\": {\n        \"containsText\": {\n          \"text\": \"inv_curr\",\n          \"matchCase\": true\n        },\n        \"replaceText\": \"{{ $('Postgres').item.json.curr_inv }}\"\n      }\n    },\n    {\n      \"replaceAllText\": {\n        \"containsText\": {\n          \"text\": \"TotalAmount\",\n          \"matchCase\": true\n        },\n        \"replaceText\": \"{{ $('Postgres').item.json.total_cost }}\"\n      }\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "id": "971984b0-d917-458c-bbd0-83b8d4df71ce",
+      "name": "Replace Text in Document",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3728,
+        368
+      ],
+      "executeOnce": false,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "--Новый скрипт\nSELECT \n    logs_no.*, \n    pd.public_holidays_calendar, \n    pd.type_, \n    pd.acmeer, \n    pd.email, \n    pd.logs, \n    pd.active, \n    hr.legal_address, \n    hr.name_contract,\n\n    -- SAFE total_cost calculation\n    to_char(\n        ROUND(\n            (logs_no.wh_plan::numeric - COALESCE(e_h.exclude_h * 8, 0)) \n            *\n            COALESCE(\n                CASE \n                    WHEN hr.rate ~ '^[0-9]+(\\.[0-9]+)?$'\n                    THEN hr.rate::numeric\n                    ELSE NULL\n                END\n            , 0)\n        , 2),\n    'FM999,999,999,990.00'\n    ) AS total_cost,\n\n    -- fact hours\n    (logs_no.wh_plan::numeric - COALESCE(e_h.exclude_h * 8, 0)) AS fact_hours,\n\n    hr.employer AS employer,\n\n    -- SAFE numeric rate output\n    CASE \n        WHEN hr.rate ~ '^[0-9]+(\\.[0-9]+)?$'\n        THEN hr.rate::numeric\n        ELSE NULL\n    END AS rate_numeric,\n\n    hr.curr_rate,\n    hr.curr_inv,\n    hr.work_order,\n    hr.work_order_date\n\nFROM  \n(select \n\tl.id,\n\tl.full_name,\n\tl.eop,\n\tpd.resource_pool as resource_pool,\n\tcase when pd.type_ = 'Lended resource' then 'Lended'\n\t\telse 'Ordinary' end as type_,\n\tcase when pd.pass_through_ in ('', null) then 'No'\n\t\telse pd.pass_through_ end as pass_through_,\n\tl.hours_plan as wh_plan,\n\tl.hours_logged as fact,\n\tl.hours_not_logged as diff\nfrom pe_v2.logs_03 as l\nleft join ops.pd as pd --сотрудники в статусе Active\n\ton l.id = pd.id\n\tand l.eop >= pd.valid_from \n\tand l.eop <= pd.valid_to\n\tand pd.active = 'Yes'\n)\n\n\nas logs_no\n\nLEFT JOIN ops.pd AS pd\n    ON logs_no.full_name = pd.full_name \n    AND logs_no.eop >= pd.valid_from \n    AND logs_no.eop <= pd.valid_to\n\nLEFT JOIN ops.hr_rates AS hr\n    ON logs_no.full_name = hr.name_ \n    AND logs_no.eop >= hr.date_from \n    AND logs_no.eop <= hr.date_to\n\nLEFT JOIN (\n    SELECT\n        v.reporter AS full_name,\n        (DATE_TRUNC('MONTH', v.end_date) + INTERVAL '1 MONTH' - INTERVAL '1 day')::date AS eop,\n        SUM(\n            CASE \n                WHEN v.vacation_type = 'Unpaid' THEN\n                    (\n                        SELECT COUNT(*)\n                        FROM generate_series(v.start, v.end_date, INTERVAL '1 day') AS d\n                        WHERE EXTRACT(DOW FROM d)::int NOT IN (0, 6)\n                    )\n                ELSE 0\n            END\n        ) AS exclude_h\n    FROM ops.vacations v\n    WHERE v.status IN ('In Progress', 'Done')\n    GROUP BY v.reporter, \n             (DATE_TRUNC('MONTH', v.end_date) + INTERVAL '1 MONTH' - INTERVAL '1 day')\n) AS e_h\n    ON logs_no.full_name = e_h.full_name \n    AND logs_no.eop = e_h.eop\n\nWHERE \n    pd.type_ = 'Contractor' \n    AND pd.acmeer = 'Yes' \n    AND logs_no.eop = '{{ $json.lastDay }}'\n    --AND logs_no.eop = '2026-04-30'\n    AND hr.rate_base = 'Per hour' \n    AND logs_no.wh_plan > 0;",
+        "options": {}
+      },
+      "id": "35f12bde-e877-46f2-b3f5-a1cddf749105",
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [
+        1712,
+        384
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtHour": 1,
+              "triggerAtMinute": 50
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        288,
+        592
+      ],
+      "id": "fd823b86-bcd4-4bd9-af2c-2e1a99ff1c6c",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "function getPreviousMonthDates() {\n  const now = new Date();\n  const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);\n  const firstDay = prevMonth.toISOString().split('T')[0];\n  const lastDay = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0];\n  \n  return {\n    firstDay,\n    lastDay\n  };\n}\n\nconst { firstDay, lastDay } = getPreviousMonthDates();\nreturn { firstDay, lastDay };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1552,
+        384
+      ],
+      "id": "65d58db2-90b8-41fe-bc12-7ef266c5cc76",
+      "name": "Get Previos month"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultUrl": "REDACTED",
+          "cachedResultName": "REDACTED"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        928,
+        592
+      ],
+      "id": "ffcbf093-123b-4b10-bbbc-c3954c02e5e2",
+      "name": "HR Rates to DWH",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "waitBetweenTries": 3000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultUrl": "REDACTED",
+          "cachedResultName": "REDACTED"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1248,
+        592
+      ],
+      "id": "2b825813-a187-411a-89eb-75f9e07a7950",
+      "name": "PE report",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultUrl": "REDACTED",
+          "cachedResultName": "REDACTED"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        912,
+        352
+      ],
+      "id": "742cf2ca-421c-4cea-be92-f10d05dd4667",
+      "name": "HR Rates to DWH1",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "waitBetweenTries": 3000,
+      "alwaysOutputData": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultUrl": "REDACTED",
+          "cachedResultName": "REDACTED"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1184,
+        352
+      ],
+      "id": "11155834-2725-41cf-bd57-45deafa5e6ef",
+      "name": "Pe Report 1",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultUrl": "REDACTED",
+          "cachedResultName": "REDACTED"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        352
+      ],
+      "id": "62491566-a468-49de-937d-315321ad460f",
+      "name": "PPL dir to DWH",
+      "alwaysOutputData": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultUrl": "REDACTED",
+          "cachedResultName": "REDACTED"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        592
+      ],
+      "id": "2ffd1447-7de9-43df-b0a0-228222a3b731",
+      "name": "PPL dir to DWH1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "fromEmail": "REDACTED",
+        "toEmail": "REDACTED",
+        "subject": "Action required: For contractors providing monthly services",
+        "html": "=Dear {{ $('Postgres').item.json.full_name }},\n<p><b>The draft invoice for your regular services </b> last month has been automatically created. Please follow the subsequent steps.</p>\n<p>Action Required:</p>\n<p><b>1.</b>Review the draft invoice.</p>\n<p><b>2.</b>Make any necessary corrections.</p>\n<p><b>3.Create a Jira request.</b></p>\n<p><b>4.</b>Upload the finalized invoice for your regular services (you may also upload your own draft) by the 5th.</p>\n\n<p><b>Invoice:</b> https://docs.google.com/document/d/{{ $json.documentId }}</p>\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "6184a80d-278c-4e7e-88af-3300f43f803a",
+      "name": "Send Email Test Test",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        4272,
+        288
+      ],
+      "webhookId": "REDACTED",
+      "credentials": {
+        "smtp": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "full_name",
+              "displayName": "full_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "eop",
+              "displayName": "eop",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "resource_pool",
+              "displayName": "resource_pool",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "type_",
+              "displayName": "type_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "pass_through_",
+              "displayName": "pass_through_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "wh_plan",
+              "displayName": "wh_plan",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fact",
+              "displayName": "fact",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "diff",
+              "displayName": "diff",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "public_holidays_calendar",
+              "displayName": "public_holidays_calendar",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "acmeer",
+              "displayName": "acmeer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "logs",
+              "displayName": "logs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "active",
+              "displayName": "active",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "legal_address",
+              "displayName": "legal_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name_contract",
+              "displayName": "name_contract",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "total_cost",
+              "displayName": "total_cost",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fact_hours",
+              "displayName": "fact_hours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "employer",
+              "displayName": "employer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rate_numeric",
+              "displayName": "rate_numeric",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "curr_rate",
+              "displayName": "curr_rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "curr_inv",
+              "displayName": "curr_inv",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "work_order",
+              "displayName": "work_order",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "work_order_date",
+              "displayName": "work_order_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2160,
+        128
+      ],
+      "id": "134edb0c-0ccb-4eef-b587-16e676839356",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1856,
+        128
+      ],
+      "id": "29cd10c4-8539-469e-b0e5-effc099c5dd1",
+      "name": "Clear sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "e8f57907-2f08-4e1a-bfdf-2c01b983813c",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        784
+      ],
+      "id": "413599d2-91e8-40c1-9cae-0d226642330c",
+      "name": "Webhook",
+      "webhookId": "REDACTED"
+    },
+    {
+      "parameters": {
+        "fromEmail": "REDACTED",
+        "toEmail": "REDACTED",
+        "subject": "Action required: For contractors providing monthly services",
+        "html": "=Dear {{ $('Postgres').item.json.full_name }},\n<p><b>The draft invoice for your regular services </b> last month has been automatically created. Please follow the subsequent steps.</p>\n<p>Action Required:</p>\n<p><b>1.</b>Review the draft invoice.</p>\n<p><b>2.</b>Make any necessary corrections.</p>\n<p><b>3.Create a Jira request.</b></p>\n<p><b>4.</b>Upload the finalized invoice for your regular services (you may also upload your own draft) by the 5th.</p>\n\n<p><b>Invoice:</b> https://docs.google.com/document/d/{{ $json.documentId }}</p>\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "66d8059c-e6eb-4684-8a36-0640c9e6e0d4",
+      "name": "Send Email Test Test1",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        4272,
+        480
+      ],
+      "webhookId": "REDACTED",
+      "credentials": {
+        "smtp": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      },
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "PPL dir to DWH1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy Template File": {
+      "main": [
+        [
+          {
+            "node": "Replace Text in Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "invMonth": {
+      "main": [
+        [
+          {
+            "node": "Create Inv Number",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Inv Number": {
+      "main": [
+        [
+          {
+            "node": "Copy Template File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Jira ID": {
+      "main": [
+        [
+          {
+            "node": "invMonth",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Payer and Currency": {
+      "main": [
+        [
+          {
+            "node": "Get Payer Rate And Currency",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Payer Rate And Currency": {
+      "main": [
+        [
+          {
+            "node": "Get Jira ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Map Payer and Currency",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Text in Document": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Email Test Test",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Email Test Test1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Clear sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "PPL dir to DWH1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Previos month": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HR Rates to DWH": {
+      "main": [
+        [
+          {
+            "node": "PE report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PE report": {
+      "main": [
+        [
+          {
+            "node": "Get Previos month",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HR Rates to DWH1": {
+      "main": [
+        [
+          {
+            "node": "Pe Report 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pe Report 1": {
+      "main": [
+        [
+          {
+            "node": "Get Previos month",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PPL dir to DWH": {
+      "main": [
+        [
+          {
+            "node": "HR Rates to DWH1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PPL dir to DWH1": {
+      "main": [
+        [
+          {
+            "node": "HR Rates to DWH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear sheet": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  }
+}

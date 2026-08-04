@@ -1,0 +1,2243 @@
+{
+  "name": "NDA Import",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        0
+      ],
+      "id": "afb9d9e0-4826-4425-ab8c-2eb1b25b1324",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.atlassian.com/jira/forms/cloud/REDACTED_FORM_ID/issue/{{ $('Jira Software1').item.json.key }}/form ",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "jiraSoftwareCloudApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-ExperimentalApi",
+              "value": "opt-in"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchInterval": 3000
+            }
+          }
+        }
+      },
+      "id": "b1de586d-7317-457c-ac6c-a04df12ecf78",
+      "name": "List attached form1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        320,
+        0
+      ],
+      "executeOnce": false,
+      "retryOnFail": true,
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "276e7846-8db2-4458-8935-5756a741aad7",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "NDA",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        544,
+        0
+      ],
+      "id": "4cbc4466-e601-44cc-8570-835adfe58b03",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.atlassian.com/jira/forms/cloud/REDACTED_FORM_ID/issue/{{ $('Jira Software1').item.json.key }}/form/{{ $json.id }} ",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "jiraSoftwareCloudApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-ExperimentalApi",
+              "value": "opt-in"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchInterval": 3000
+            }
+          }
+        }
+      },
+      "id": "44407ff1-34fe-46a8-8848-18248c12ce91",
+      "name": "Read data from attached forms",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        800,
+        -16
+      ],
+      "executeOnce": false,
+      "retryOnFail": false,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "keepFirstRow": true
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -128,
+        0
+      ],
+      "id": "bc393fa5-0957-4336-b320-e8fd303fe507",
+      "name": "Google Sheets1",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8f40d787-e771-4522-847e-1a62c9b358b2",
+              "leftValue": "={{ $json.state.answers['92'].text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "c07dfb15-995e-4bca-b5db-52ba73319f52",
+              "leftValue": "={{ $json.state.answers['93'].choices[0] }}",
+              "rightValue": "2",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1184,
+        -704
+      ],
+      "id": "47f46ea7-3707-4b14-914b-96c992818139",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f1bfabce-3780-4717-856c-d68796cd5267",
+              "leftValue": "={{ $('Read data from attached forms').item.json.state.answers['98'].text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7b072b27-bbdf-4c98-b43c-44e2a24e6279",
+              "leftValue": "={{ $('Read data from attached forms').item.json.state.answers['99'].choices }}",
+              "rightValue": "2",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": "",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1328,
+        -544
+      ],
+      "id": "44082f13-3e1c-4745-9be7-be4e2fe843ba",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f1bfabce-3780-4717-856c-d68796cd5267",
+              "leftValue": "={{ $json.state.answers['110'].text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7b072b27-bbdf-4c98-b43c-44e2a24e6279",
+              "leftValue": "={{ $json.state.answers['111'].choices }}",
+              "rightValue": "2",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1312,
+        -384
+      ],
+      "id": "4503618c-abe1-4ea0-a14e-fce3b0bec338",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SD N": "={{ $('Jira Software1').item.json.key }}",
+            "Account Code from SF": "={{ $json['Account Code'] }}",
+            "Counterparty name from SF": "={{ $json['Invoicing client'] }}",
+            "acme Entity ": "={{ $('Jira Software1').item.json.fields.customfield_10377.value }}",
+            "Risks ": "=NDA validity period or Confidential Information storing period are not limited",
+            "Who accepted the Risk": "={{ $('If3').item.json.state.answers['112'].users[0].name }}",
+            "Comment": "={{ $('If3').item.json.state.answers['110'].text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Account Code from SF",
+              "displayName": "Account Code from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Counterparty name from SF",
+              "displayName": "Counterparty name from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "acme Entity ",
+              "displayName": "acme Entity ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SD N",
+              "displayName": "SD N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Risks ",
+              "displayName": "Risks ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Who accepted the Risk",
+              "displayName": "Who accepted the Risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Comment",
+              "displayName": "Comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1632,
+        -400
+      ],
+      "id": "49e5e1ed-b0a0-419a-b202-9558d66c7889",
+      "name": "Exclusion of compensation for lost profits",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SD N": "={{ $('Jira Software1').item.json.key }}",
+            "Account Code from SF": "={{ $json['Account Code'] }}",
+            "Counterparty name from SF": "={{ $json['Invoicing client'] }}",
+            "acme Entity ": "={{ $('Jira Software1').item.json.fields.customfield_10377.value }}",
+            "Risks ": "=NDA validity period or Confidential Information storing period are not limited",
+            "Who accepted the Risk": "={{ $('Read data from attached forms').item.json.state.answers['100'].users[0].name }}",
+            "Comment": "={{ $('Read data from attached forms').item.json.state.answers['98'].text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Account Code from SF",
+              "displayName": "Account Code from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Counterparty name from SF",
+              "displayName": "Counterparty name from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "acme Entity ",
+              "displayName": "acme Entity ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SD N",
+              "displayName": "SD N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Risks ",
+              "displayName": "Risks ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Who accepted the Risk",
+              "displayName": "Who accepted the Risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Comment",
+              "displayName": "Comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1648,
+        -560
+      ],
+      "id": "72f5b831-97a9-431b-8623-11a8039f2c78",
+      "name": "NDA validity period or Confidential Information storing period are not limited",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SD N": "={{ $('Jira Software1').item.json.key }}",
+            "acme Entity ": "={{ $('Jira Software1').item.json.fields.customfield_10377.value }}",
+            "Risks ": "NDA is Unilateral",
+            "Who accepted the Risk": "={{ $('Read data from attached forms').item.json.state.answers['94'].users[0].name }}",
+            "Comment": "={{ $('Read data from attached forms').item.json.state.answers['92'].text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Account Code from SF",
+              "displayName": "Account Code from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Counterparty name from SF",
+              "displayName": "Counterparty name from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "acme Entity ",
+              "displayName": "acme Entity ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SD N",
+              "displayName": "SD N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Risks ",
+              "displayName": "Risks ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Who accepted the Risk",
+              "displayName": "Who accepted the Risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Comment",
+              "displayName": "Comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1632,
+        -720
+      ],
+      "id": "ca8202d3-07de-4fbe-a951-a9f05fda8309",
+      "name": "NDA is Unilateral",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f1bfabce-3780-4717-856c-d68796cd5267",
+              "leftValue": "={{ $json.state.answers['116'].text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7b072b27-bbdf-4c98-b43c-44e2a24e6279",
+              "leftValue": "={{ $json.state.answers['117'].choices }}",
+              "rightValue": "2",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1312,
+        -240
+      ],
+      "id": "c060b457-5d6a-4d0b-bf49-802ed22707ef",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SD N": "={{ $('Jira Software1').item.json.key }}",
+            "Account Code from SF": "={{ $json['Account Code'] }}",
+            "Counterparty name from SF": "={{ $json['Invoicing client'] }}",
+            "acme Entity ": "={{ $('Jira Software1').item.json.fields.customfield_10377.value }}",
+            "Risks ": "=General total liability limitation",
+            "Who accepted the Risk": "={{ $('If4').item.json.state.answers['118'].users[0].name }}",
+            "Comment": "={{ $('If4').item.json.state.answers['116'].text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Account Code from SF",
+              "displayName": "Account Code from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Counterparty name from SF",
+              "displayName": "Counterparty name from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "acme Entity ",
+              "displayName": "acme Entity ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SD N",
+              "displayName": "SD N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Risks ",
+              "displayName": "Risks ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Who accepted the Risk",
+              "displayName": "Who accepted the Risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Comment",
+              "displayName": "Comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1632,
+        -256
+      ],
+      "id": "38485fa4-29dd-4aee-b844-1d2ea50fcca3",
+      "name": "General total liability limitation",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f1bfabce-3780-4717-856c-d68796cd5267",
+              "leftValue": "={{ $json.state.answers['122'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7b072b27-bbdf-4c98-b43c-44e2a24e6279",
+              "leftValue": "={{ $json.state.answers['123'].choices }}",
+              "rightValue": "2",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1312,
+        -96
+      ],
+      "id": "7b7e9558-692e-491d-9aa9-e2348558b181",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SD N": "={{ $('Jira Software1').item.json.key }}",
+            "Account Code from SF": "={{ $json['Account Code'] }}",
+            "Counterparty name from SF": "={{ $json['Invoicing client'] }}",
+            "acme Entity ": "={{ $('Jira Software1').item.json.fields.customfield_10377.value }}",
+            "Risks ": "=Possibility to transfer Confidential Information to affiliated parties",
+            "Who accepted the Risk": "={{ $('If5').item.json.state.answers['124'].users[0].name }}",
+            "Comment": "={{ $('If5').item.json.state.answers['122'].text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Account Code from SF",
+              "displayName": "Account Code from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Counterparty name from SF",
+              "displayName": "Counterparty name from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "acme Entity ",
+              "displayName": "acme Entity ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SD N",
+              "displayName": "SD N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Risks ",
+              "displayName": "Risks ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Who accepted the Risk",
+              "displayName": "Who accepted the Risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Comment",
+              "displayName": "Comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1632,
+        -128
+      ],
+      "id": "7153c6c2-9f9b-4d2a-bdbb-78c0223e308e",
+      "name": "Possibility to transfer Confidential Information to affiliated parties",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f1bfabce-3780-4717-856c-d68796cd5267",
+              "leftValue": "={{ $json.state.answers['128'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7b072b27-bbdf-4c98-b43c-44e2a24e6279",
+              "leftValue": "={{ $json.state.answers['129'].choices }}",
+              "rightValue": "2",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1280,
+        48
+      ],
+      "id": "21ca8ce3-cf7a-4764-bf8a-9b0de7e84905",
+      "name": "If6"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f1bfabce-3780-4717-856c-d68796cd5267",
+              "leftValue": "={{ $json.state.answers['235'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7b072b27-bbdf-4c98-b43c-44e2a24e6279",
+              "leftValue": "={{ $json.state.answers['236'].choices }}",
+              "rightValue": "2",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1280,
+        192
+      ],
+      "id": "b3ffa7de-8212-488a-9b30-af27090fa772",
+      "name": "If7"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SD N": "={{ $('Jira Software1').item.json.key }}",
+            "Account Code from SF": "={{ $json['Account Code'] }}",
+            "Counterparty name from SF": "={{ $json['Invoicing client'] }}",
+            "acme Entity ": "={{ $('Jira Software1').item.json.fields.customfield_10377.value }}",
+            "Risks ": "=Business restrictions",
+            "Who accepted the Risk": "={{ $('If6').item.json.state.answers['130'].users[0].name }}",
+            "Comment": "={{ $('If6').item.json.state.answers['128'].text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Account Code from SF",
+              "displayName": "Account Code from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Counterparty name from SF",
+              "displayName": "Counterparty name from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "acme Entity ",
+              "displayName": "acme Entity ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SD N",
+              "displayName": "SD N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Risks ",
+              "displayName": "Risks ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Who accepted the Risk",
+              "displayName": "Who accepted the Risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Comment",
+              "displayName": "Comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1600,
+        32
+      ],
+      "id": "9d8cdbfe-b492-48e9-8200-e5ef3d0ecb3f",
+      "name": "Business restrictions",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SD N": "={{ $('Jira Software1').item.json.key }}",
+            "Account Code from SF": "={{ $json['Account Code'] }}",
+            "Counterparty name from SF": "={{ $json['Invoicing client'] }}",
+            "acme Entity ": "={{ $('Jira Software1').item.json.fields.customfield_10377.value }}",
+            "Risks ": "=Other 1",
+            "Who accepted the Risk": "={{ $('If7').item.json.state.answers['237'].users[0].name }}",
+            "Comment": "={{ $('If7').item.json.state.answers['235'].text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Account Code from SF",
+              "displayName": "Account Code from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Counterparty name from SF",
+              "displayName": "Counterparty name from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "acme Entity ",
+              "displayName": "acme Entity ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SD N",
+              "displayName": "SD N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Risks ",
+              "displayName": "Risks ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Who accepted the Risk",
+              "displayName": "Who accepted the Risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Comment",
+              "displayName": "Comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1600,
+        160
+      ],
+      "id": "7e7b37de-e454-42b6-89cd-85d871da7a3f",
+      "name": "Other 1",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f1bfabce-3780-4717-856c-d68796cd5267",
+              "leftValue": "={{ $json.state.answers['241'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7b072b27-bbdf-4c98-b43c-44e2a24e6279",
+              "leftValue": "={{ $json.state.answers['242'].choices }}",
+              "rightValue": "2",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1280,
+        352
+      ],
+      "id": "d259033e-efd8-4c82-a00b-85443147d5f5",
+      "name": "If8"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f1bfabce-3780-4717-856c-d68796cd5267",
+              "leftValue": "={{ $json.state.answers['247'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7b072b27-bbdf-4c98-b43c-44e2a24e6279",
+              "leftValue": "={{ $json.state.answers['248'].choices }}",
+              "rightValue": "2",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1280,
+        480
+      ],
+      "id": "4ea8c542-ce44-4476-b1ac-d87c1c0eb945",
+      "name": "If9"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SD N": "={{ $('Jira Software1').item.json.key }}",
+            "Account Code from SF": "={{ $json['Account Code'] }}",
+            "Counterparty name from SF": "={{ $json['Invoicing client'] }}",
+            "acme Entity ": "={{ $('Jira Software1').item.json.fields.customfield_10377.value }}",
+            "Risks ": "=Other 2",
+            "Who accepted the Risk": "={{ $('If8').item.json.state.answers['243'].users[0].name }}",
+            "Comment": "={{ $('If8').item.json.state.answers['241'].text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Account Code from SF",
+              "displayName": "Account Code from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Counterparty name from SF",
+              "displayName": "Counterparty name from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "acme Entity ",
+              "displayName": "acme Entity ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SD N",
+              "displayName": "SD N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Risks ",
+              "displayName": "Risks ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Who accepted the Risk",
+              "displayName": "Who accepted the Risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Comment",
+              "displayName": "Comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1600,
+        320
+      ],
+      "id": "3cfd22fb-77ce-48f1-a99b-ae50968717ba",
+      "name": "Other 2",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SD N": "={{ $('Jira Software1').item.json.key }}",
+            "Account Code from SF": "={{ $json['Account Code'] }}",
+            "Counterparty name from SF": "={{ $json['Invoicing client'] }}",
+            "acme Entity ": "={{ $('Jira Software1').item.json.fields.customfield_10377.value }}",
+            "Risks ": "=Other 3",
+            "Who accepted the Risk": "={{ $('If9').item.json.state.answers['249'].users[0].name }}",
+            "Comment": "={{ $('If9').item.json.state.answers['247'].text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Account Code from SF",
+              "displayName": "Account Code from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Counterparty name from SF",
+              "displayName": "Counterparty name from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "acme Entity ",
+              "displayName": "acme Entity ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SD N",
+              "displayName": "SD N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Risks ",
+              "displayName": "Risks ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Who accepted the Risk",
+              "displayName": "Who accepted the Risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Comment",
+              "displayName": "Comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1600,
+        464
+      ],
+      "id": "a3b52671-9dc3-4d4c-8349-32e038365da8",
+      "name": "Other 3",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f1bfabce-3780-4717-856c-d68796cd5267",
+              "leftValue": "={{ $json.state.answers['253'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7b072b27-bbdf-4c98-b43c-44e2a24e6279",
+              "leftValue": "={{ $json.state.answers['254'].choices }}",
+              "rightValue": "2",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1264,
+        640
+      ],
+      "id": "dd00eabc-a0d0-479c-a865-a41344d85706",
+      "name": "If10"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f1bfabce-3780-4717-856c-d68796cd5267",
+              "leftValue": "={{ $json.state.answers['272'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7b072b27-bbdf-4c98-b43c-44e2a24e6279",
+              "leftValue": "={{ $json.state.answers['273'].choices }}",
+              "rightValue": "2",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1264,
+        784
+      ],
+      "id": "450207e7-8632-459d-ac24-3498e6304bb3",
+      "name": "If11"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SD N": "={{ $('Jira Software1').item.json.key }}",
+            "Account Code from SF": "={{ $json['Account Code'] }}",
+            "Counterparty name from SF": "={{ $json['Invoicing client'] }}",
+            "acme Entity ": "={{ $('Jira Software1').item.json.fields.customfield_10377.value }}",
+            "Risks ": "=Other 5",
+            "Who accepted the Risk": "={{ $('If11').item.json.state.answers['274'].users[0].name }}",
+            "Comment": "={{ $('If11').item.json.state.answers['272'].text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Account Code from SF",
+              "displayName": "Account Code from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Counterparty name from SF",
+              "displayName": "Counterparty name from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "acme Entity ",
+              "displayName": "acme Entity ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SD N",
+              "displayName": "SD N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Risks ",
+              "displayName": "Risks ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Who accepted the Risk",
+              "displayName": "Who accepted the Risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Comment",
+              "displayName": "Comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1584,
+        768
+      ],
+      "id": "cfaf4665-2ca9-44a5-87e0-d8ba6aac4d2c",
+      "name": "Other 5",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "REDACTED",
+        "sheetName": {
+          "__rl": true,
+          "value": "REDACTED",
+          "mode": "list",
+          "cachedResultName": "REDACTED",
+          "cachedResultUrl": "REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SD N": "={{ $('Jira Software1').item.json.key }}",
+            "Account Code from SF": "={{ $json['Account Code'] }}",
+            "Counterparty name from SF": "={{ $json['Invoicing client'] }}",
+            "acme Entity ": "={{ $('Jira Software1').item.json.fields.customfield_10377.value }}",
+            "Risks ": "=Other 4",
+            "Who accepted the Risk": "={{ $('If10').item.json.state.answers['255'].users[0].name }}",
+            "Comment": "={{ $('If10').item.json.state.answers['253'].text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Account Code from SF",
+              "displayName": "Account Code from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Counterparty name from SF",
+              "displayName": "Counterparty name from SF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "acme Entity ",
+              "displayName": "acme Entity ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SD N",
+              "displayName": "SD N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Risks ",
+              "displayName": "Risks ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Who accepted the Risk",
+              "displayName": "Who accepted the Risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Comment",
+              "displayName": "Comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1584,
+        624
+      ],
+      "id": "b5ef73d1-5ca6-409f-a318-891c04775b48",
+      "name": "Other 4",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "options": {
+          "jql": "\"request type\" = \"Legal Request  (SD)\" AND status IN (Closed, Done) AND resolution NOT IN (\"Won't Do\", Duplicate, Declined) ORDER BY created DESC"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        80,
+        0
+      ],
+      "id": "46f7eea8-37f1-4df6-97a6-dd104012f589",
+      "name": "Jira Software1",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "issueKey": "SD-6980",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        0,
+        224
+      ],
+      "id": "bfd19d12-f998-484e-ad67-7568719656ca",
+      "name": "Jira Software",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "REDACTED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -336,
+        -192
+      ],
+      "id": "21adee02-e7db-4182-ab17-f09084251f8d",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List attached form1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Read data from attached forms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read data from attached forms": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If6",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If7",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If8",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If9",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If10",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If11",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Jira Software1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "NDA is Unilateral",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "NDA validity period or Confidential Information storing period are not limited",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Exclusion of compensation for lost profits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "General total liability limitation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "Possibility to transfer Confidential Information to affiliated parties",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If6": {
+      "main": [
+        [
+          {
+            "node": "Business restrictions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If7": {
+      "main": [
+        [
+          {
+            "node": "Other 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If8": {
+      "main": [
+        [
+          {
+            "node": "Other 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If9": {
+      "main": [
+        [
+          {
+            "node": "Other 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If10": {
+      "main": [
+        [
+          {
+            "node": "Other 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If11": {
+      "main": [
+        [
+          {
+            "node": "Other 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira Software1": {
+      "main": [
+        [
+          {
+            "node": "List attached form1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira Software": {
+      "main": [
+        []
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  }
+}
