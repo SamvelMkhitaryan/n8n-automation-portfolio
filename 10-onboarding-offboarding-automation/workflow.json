@@ -1,0 +1,1900 @@
+{
+  "name": "Onboarding/Offboarding Subtasks",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://api.atlassian.com/jira/forms/cloud/your-instance-id/issue/{{ $json.key }}/form ",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "jiraSoftwareCloudApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-ExperimentalApi",
+              "value": "opt-in"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchInterval": 10000
+            }
+          }
+        }
+      },
+      "id": "dc2b2ba8-7e15-52dc-ae6e-ba648d58f79c",
+      "name": "List attached form",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -3536,
+        2240
+      ],
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "issueKey": "={{$('Jira Trigger').item.json.issue.key }}",
+        "additionalFields": {}
+      },
+      "id": "caf56810-5de0-508f-8681-4905fdbf9843",
+      "name": "Get Issues",
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -3760,
+        2240
+      ],
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.atlassian.com/jira/forms/cloud/your-instance-id/issue/{{ $('Get Issues').item.json.key }}/form/{{ $json.id }} ",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "jiraSoftwareCloudApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-ExperimentalApi",
+              "value": "opt-in"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0acf3eb4-483f-5721-92b8-05dd1ba4d035",
+      "name": "Read data from attached forms1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -3312,
+        2240
+      ],
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f3231494-4b6d-4f27-REDACTEDb93-96REDACTED1991aed1d",
+              "leftValue": "={{ $json.comment.body }}",
+              "rightValue": "Create sub-tasks",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "id": "3456cb49-4b07-5906-a83f-c7b8e37cc768",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3968,
+        2240
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -4160,
+        2448
+      ],
+      "id": "7fd02c61-a0c6-5b67-915a-df16d75e060c",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0REDACTED26dREDACTEDd2-a00c-4ba2-91d5-43ed7522b0bb",
+              "leftValue": "={{ $('List attached form').item.json.name }}",
+              "rightValue": "Onboarding ",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2976,
+        2240
+      ],
+      "id": "99f85943-a074-53b1-8906-3d6b2209fdb0",
+      "name": "Onboarding/Offboarding"
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "={{ $json.Employer }}: New {{ $json.Type }} - {{ $json['Full Name'] }} (1st WD -{{ $json['Start Date'] }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1824,
+        -48
+      ],
+      "id": "d8ccaa11-8ba2-582e-807f-2c73f05de987",
+      "name": "Start date",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "={{ $json.Employer }}: New {{ $json.Type }} - {{ $json['Full Name'] }}  in acquiring access to the office (1st WD - {{ $json['Start Date'] }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1824,
+        192
+      ],
+      "id": "02ee9388-a74d-526e-ab8f-a46cf1b462b0",
+      "name": "Access To Office",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "={{ $json.Employer }}: New {{ $json.Type }} - {{ $json['Full Name'] }} to the appropriate Voluntary Medical Insurance policy (1st WD - {{ $json['Start Date'] }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1824,
+        400
+      ],
+      "id": "111127b9-b359-5b44-8c38-ca3722290a07",
+      "name": "Med Inshurance",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_002",
+          "mode": "list",
+          "cachedResultName": "ACME People Directory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_002/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 209255972,
+          "mode": "list",
+          "cachedResultName": "Directory (Short)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_002/edit#gid=209255972"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Full Name",
+              "lookupValue": "={{ $('Get Issues').item.json.fields.customfield_10076 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -2336,
+        1280
+      ],
+      "id": "2a29c8ec-49e5-5381-8e76-ebd29e93abeb",
+      "name": "Get New Employee",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_002",
+          "mode": "list",
+          "cachedResultName": "ACME People Directory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_002/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 209255972,
+          "mode": "list",
+          "cachedResultName": "Directory (Short)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_002/edit#gid=209255972"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Full Name",
+              "lookupValue": "={{ ($('Get Issues').item.json.fields.customfield_10073?.[0]?.displayName || '') + '' + ($json.state.answers?.['11']?.text || '') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -2544,
+        5472
+      ],
+      "id": "a0ead98d-0c9a-51d6-87ee-9f7787d13f05",
+      "name": "Get Offboarding Person",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "={{ $json.Employer }}: Material Transfer Agreement - {{ $json['Full Name'] }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        4368
+      ],
+      "id": "d2f79091-d337-5d72-9c13-b9788f37abd0",
+      "name": "Material Transfer Agreement",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "={{ $json.Employer }}:Final Payout - {{ $json['Full Name'] }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        4608
+      ],
+      "id": "db4250d4-1482-5a3b-a652-da2417b37bba",
+      "name": "Final Payout",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "={{ $json.Employer }}:Terminate medical insurance - {{ $json['Full Name'] }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        4848
+      ],
+      "id": "a6d9367a-a3b4-55f4-be3a-bc2519ddd94b",
+      "name": "Terminate medical insurance",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "={{ $json.Employer }}:Terminate access to office - {{ $json['Full Name'] }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        5072
+      ],
+      "id": "298facd1-6ea2-5d6f-bf27-54f7b87acc7d",
+      "name": "Terminate access to office",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "events": [
+          "comment_created"
+        ],
+        "additionalFields": {
+          "filter": " \"request type\" IN (\"Onboarding (SD)\", \"Offboarding (SD)\") ORDER BY created DESC"
+        }
+      },
+      "id": "866fc6f8-46c0-58e8-9544-bdd21518f370",
+      "name": "Jira Trigger",
+      "type": "n8n-nodes-base.jiraTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -4208,
+        2208
+      ],
+      "webhookId": "a1c2618b-8859-497f-85a6-bc64cce0e2e2",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Create the ACME account for {{ $json['Full Name'] }} - ppl dir ID {{ $json.ID }} (1st WD - {{ $json['Start Date'] }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1824,
+        592
+      ],
+      "id": "500bf0ab-11e4-5661-80d7-206348714767",
+      "name": "Corp Account",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Complete the onboarding in Vanta - {{ $json['Full Name'] }} (1st WD - {{ $json['Start Date'] }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1824,
+        784
+      ],
+      "id": "1d3c8481-0098-5776-a87c-1be2fa4865f1",
+      "name": "Vanta Onboarding",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Add to the relevant Slack channels - {{ $json['Full Name'] }} (1st WD - {{ $json['Start Date'] }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1808,
+        960
+      ],
+      "id": "9079d282-b88f-565c-9845-a5fe8fb20bb0",
+      "name": "Slack",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Update the PPL dir, HR database and Team Directory - {{ $json['Full Name'] }} (1st WD - {{ $json['Start Date'] }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1808,
+        1136
+      ],
+      "id": "2997f4cf-02f4-50c6-a537-4ba9dbe64285",
+      "name": "Team Dir",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Complete the paperwork - {{ $json.Employer }}, {{ $json.Type }}, {{ $json['Full Name'] }} (1st WD - {{ $json['Start Date'] }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1792,
+        1360
+      ],
+      "id": "8cbea3dc-b16d-5196-b8b9-d2a0f068805f",
+      "name": "Paperwork",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Onboarding in internal accounting platforms - {{ $json['Full Name']}} (1st WD - {{ $json['Start Date'] }}) ",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1808,
+        1536
+      ],
+      "id": "2b7ba20e-7b7a-54ff-95f2-b3f4e8ddb842",
+      "name": "Internal Acc",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Complete the Vetty background check - {{ $json['Full Name'] }} (1st WD - {{ $json['Start Date'] }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1808,
+        1712
+      ],
+      "id": "1255a551-fcb9-5871-8da3-55ddd9ca9e13",
+      "name": "Vetty",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Complete the MDM onboarding - {{$json['Full Name']}} (1st WD - {{ $json['Start Date'] }} )",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1792,
+        1952
+      ],
+      "id": "2d0dc815-6a36-58d6-89c3-5e5f1e08b028",
+      "name": "MDM",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Deactivate the ACME account of - {{ $json['Full Name'] }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        5264
+      ],
+      "id": "b5b607bb-71df-5191-a277-b219bd5401d2",
+      "name": "Deactivate the ACME account of",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Delete the ACME account of - {{ $json['Full Name'] }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        5504
+      ],
+      "id": "1d6fc091-6036-54a6-863f-aae4890a84eb",
+      "name": "Delete the ACME account of",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Complete the offboarding in Vanta  - {{ $json['Full Name'] }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        5728
+      ],
+      "id": "f3553cf3-d2d3-5fe6-b48f-4ed6dc7c2085",
+      "name": "Complete the offboarding in Vanta",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Check Jira Logs - {{ $json['Full Name'] }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        5952
+      ],
+      "id": "e9308c0a-27d7-5a4e-841c-885a41f26164",
+      "name": "Check Jira Logs",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Update the PPL dir, HR database and Team Directory - {{ $json['Full Name'] }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        6144
+      ],
+      "id": "e339c3b7-7515-51fe-8e9a-c74e743e8adf",
+      "name": "Update the PPL dir, HR database and Team Directory",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Complete the paperwork  - {{ $json['Full Name'] }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        6384
+      ],
+      "id": "6917762d-c10a-5099-903a-aee10cb0eca9",
+      "name": "Complete the paperwork",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Offboarding in internal accounting platforms - {{ $json['Full Name'] }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        6624
+      ],
+      "id": "b6deb1b1-1534-50a4-ab6e-6b69f1fda6cf",
+      "name": "Offboarding in internal accounting platforms",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Verify the balance of annual leave days  - {{ $json['Full Name'] }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        6848
+      ],
+      "id": "dfdf3579-a808-51bd-9fe2-a47b0e32a8d6",
+      "name": "Verify the balance of annual leave days",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Send the letter to ppl manager (any severance payments, bonuses, or other compensation due) - {{ $json['Full Name'] }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        7104
+      ],
+      "id": "982b78f7-1322-55db-a498-39b996dd8cd9",
+      "name": "Send the letter to ppl manager (any severance payments, bonuses, or other compensation due)",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Delete the Slack account of - {{ $json['Full Name'] }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        7312
+      ],
+      "id": "1a5a1d57-30a4-5090-a2d4-59b0f6fd4842",
+      "name": "Delete the Slack account",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Deactivate the Slack account of   - {{ $json['Full Name'] }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        7552
+      ],
+      "id": "0e4c2f0f-5b3e-5497-9e1f-162c30a7439e",
+      "name": "Deactivate the Slack account",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Complete the MDM offboarding - {{ $json['Full Name'] }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        7792
+      ],
+      "id": "822be081-7f63-55da-a176-07d76a2c1514",
+      "name": "Complete the MDM offboarding",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Move Laptop to the storage of - {{ $('Get Offboarding Person').item.json['Full Name'] }} {{$json.jira_id}}(last WD - {{ $('Read data from attached forms1').item.json.state.answers['10'].date }}) ",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1936,
+        7936
+      ],
+      "id": "f1fe2f6d-5396-51ea-ae0d-3b3a7d1ea687",
+      "name": "Move Laptop to the storage",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_006",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1495851034,
+          "mode": "list",
+          "cachedResultName": "hw_db",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_006/edit#gid=1495REDACTED51034"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "employee",
+              "lookupValue": "={{ $json['Full Name'] }}"
+            },
+            {
+              "lookupColumn": "hardware_type",
+              "lookupValue": "Standard Laptop Provision"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -2336,
+        6544
+      ],
+      "id": "7e38b66e-a5c9-5233-a670-d0fd22baad85",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Add to the relevant Notion group - {{ $json['Full Name'] }} (1st WD - {{ $json['Start Date'] }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1792,
+        2144
+      ],
+      "id": "4cf5740e-03ee-5414-b7f5-ce5725a36270",
+      "name": "Notion",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Update ACME Map - {{$json['Full Name']}} (1st WD - {{ $json['Start Date'] }} )",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1792,
+        2352
+      ],
+      "id": "fb3a1591-285f-5185-bb9f-0d141465e964",
+      "name": "Map",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Delete Notion account - {{ $('Get Offboarding Person').item.json['Full Name'] || '' }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers?.['10']?.date || '' }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        3904
+      ],
+      "id": "3d6d0748-0490-55ca-9eb1-97228c4ae948",
+      "name": "Notion OF",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10017",
+          "mode": "list",
+          "cachedResultName": "Help"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10046",
+          "mode": "list",
+          "cachedResultName": "OPS Subtask"
+        },
+        "summary": "=Update ACME Map - {{ $('Get Offboarding Person').item.json['Full Name'] || '' }} (last WD - {{ $('Read data from attached forms1').item.json.state.answers?.['10']?.date || '' }})",
+        "additionalFields": {
+          "assignee": {
+            "__rl": true,
+            "value": "62cbea17c4c3be001fb4a7REDACTEDa",
+            "mode": "list",
+            "cachedResultName": "Employee A"
+          },
+          "parentIssueKey": "={{ $('Get Issues').item.json.key }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        4144
+      ],
+      "id": "168b2a09-56ea-57de-ab9f-612158e46d0d",
+      "name": "Map OF",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "List attached form": {
+      "main": [
+        [
+          {
+            "node": "Read data from attached forms1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Issues": {
+      "main": [
+        [
+          {
+            "node": "List attached form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read data from attached forms1": {
+      "main": [
+        [
+          {
+            "node": "Onboarding/Offboarding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Get Issues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get Issues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Onboarding/Offboarding": {
+      "main": [
+        [
+          {
+            "node": "Get New Employee",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Offboarding Person",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get New Employee": {
+      "main": [
+        [
+          {
+            "node": "Start date",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Access To Office",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Med Inshurance",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Corp Account",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Vanta Onboarding",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Slack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Team Dir",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Paperwork",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Internal Acc",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Vetty",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "MDM",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Map",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Offboarding Person": {
+      "main": [
+        [
+          {
+            "node": "Material Transfer Agreement",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Final Payout",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Terminate medical insurance",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Terminate access to office",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Deactivate the ACME account of",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Delete the ACME account of",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Complete the offboarding in Vanta",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check Jira Logs",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update the PPL dir, HR database and Team Directory",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Complete the paperwork",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Offboarding in internal accounting platforms",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Verify the balance of annual leave days",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send the letter to ppl manager (any severance payments, bonuses, or other compensation due)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Delete the Slack account",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Deactivate the Slack account",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Complete the MDM offboarding",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notion OF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira Trigger": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Move Laptop to the storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "RI9tREDACTEDHHHnVM6oSsREDACTED"
+  },
+  "versionId": "REDACTED",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REDACTED_INSTANCE_ID"
+  },
+  "nodeGroups": [],
+  "id": "REDACTED",
+  "tags": [
+    {
+      "updatedAt": "2025-05-1REDACTEDT19:55:31.774Z",
+      "createdAt": "2025-05-1REDACTEDT19:55:31.774Z",
+      "id": "mGuVhF2pP6HOhdDu",
+      "name": "Onboarding/Offboarding"
+    }
+  ]
+}
