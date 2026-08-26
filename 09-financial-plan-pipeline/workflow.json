@@ -1,0 +1,1316 @@
+{
+  "name": "Cash Flow - Plan upd",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_005",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 506263741,
+          "mode": "list",
+          "cachedResultName": "FinPlan_2025",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_005/edit#gid=506263741"
+        },
+        "clear": "specificRange",
+        "range": "A2:Y"
+      },
+      "id": "fadb1e1b-8f3d-5b7a-8a3a-92744a4cd456",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.1,
+      "position": [
+        1072,
+        288
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Google Sheets"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_005",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 506263741,
+          "mode": "list",
+          "cachedResultName": "FinPlan_2025",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_005/edit#gid=506263741"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "source": "={{ $json.source }}",
+            "activity_id": "={{ $json.activity_id }}",
+            "entity": "={{ $json.entity }}",
+            "pool": "={{ $json.pool }}",
+            "cost_type": "={{ $json.cost_type }}",
+            "allocation_rule": "={{ $json.allocation_rule }}",
+            "responsible": "={{ $json.responsible }}",
+            "who_added": "={{ $json.who_added }}",
+            "service_description": "={{ $json.service_description }}",
+            "income_expense": "={{ $json.income_expense }}",
+            "pl_account": "={{ $json.pl_account }}",
+            "l_detailed": "={{ $json.l_detailed.trim() }}",
+            "month": "={{ $json.month }}",
+            "alloc_amt_usd": "={{ $json.alloc_amt_usd }}",
+            "alloc_amt_usd_cons": "={{ $json.alloc_amt_usd_cons }}",
+            "alloc_amt_usd_opt": "={{ $json.alloc_amt_usd_opt }}",
+            "l1": "={{ $json.l1 }}",
+            "l2": "={{ $json.l2 }}",
+            "l3": "={{ $json.l3 }}",
+            "l4": "={{ $json.l4 }}",
+            "l5": "={{ $json.l5 }}",
+            "l6": "={{ $json.l6 }}",
+            "l_managements": "={{ $json.l_managements }}",
+            "version": "={{ $json.version }}",
+            "run_time": "={{ $json.run_time }}",
+            "Source": "={{ $json.source }}",
+            "Activity ID": "={{ $json.activity_id }}",
+            "Entity": "={{ $json.entity }}",
+            "Pool": "={{ $json.pool }}",
+            "Cost type": "={{ $json.cost_type }}",
+            "Allocation rule": "={{ $json.allocation_rule }}",
+            "Responsible": "={{ $json.responsible }}",
+            "Who added": "={{ $json.who_added }}",
+            "Service description": "={{ $json.service_description }}",
+            "Income / Expense": "={{ $json.income_expense }}",
+            "Account": "={{ $json.pl_account }}",
+            "Month": "={{ $json.month }}",
+            "Raw amount USD": "={{ $json.alloc_amt_usd }}",
+            "Conservative amount USD": "={{ $json.alloc_amt_usd_cons }}",
+            "Optimistic amount USD": "={{ $json.alloc_amt_usd_opt }}",
+            "L1": "={{ $json.l1 }}",
+            "L2": "={{ $json.l2 }}",
+            "L3": "={{ $json.l3 }}",
+            "L4": "={{ $json.l4 }}",
+            "L5": "={{ $json.l5 }}",
+            "L6": "={{ $json.l6 }}",
+            "L Managements": "={{ $json.l_managements }}",
+            "Version": "={{ $json.version }}",
+            "Run time": "={{ $json.run_time }}",
+            "L detailed": "={{ $json.l_detailed }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Activity ID",
+              "displayName": "Activity ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Entity",
+              "displayName": "Entity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Pool",
+              "displayName": "Pool",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Cost type",
+              "displayName": "Cost type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Allocation rule",
+              "displayName": "Allocation rule",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Responsible",
+              "displayName": "Responsible",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Who added",
+              "displayName": "Who added",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Service description",
+              "displayName": "Service description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Income / Expense",
+              "displayName": "Income / Expense",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Account",
+              "displayName": "Account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "L detailed",
+              "displayName": "L detailed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Month",
+              "displayName": "Month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Raw amount USD",
+              "displayName": "Raw amount USD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Conservative amount USD",
+              "displayName": "Conservative amount USD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Optimistic amount USD",
+              "displayName": "Optimistic amount USD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "L1",
+              "displayName": "L1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "L2",
+              "displayName": "L2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "L3",
+              "displayName": "L3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "L4",
+              "displayName": "L4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "L5",
+              "displayName": "L5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "L6",
+              "displayName": "L6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "L Managements",
+              "displayName": "L Managements",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Version",
+              "displayName": "Version",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Run time",
+              "displayName": "Run time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1306a1a5-4b21-5d42-81ff-d60a1ac89917",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.1,
+      "position": [
+        1504,
+        288
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Google Sheets"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "id": "2fe9bddf-9e40-5eb5-99fc-1b33a8c3ff61",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        720,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "path": "fbf9950e-73de-4962-a636-ca1REDACTED2312c90REDACTED",
+        "options": {}
+      },
+      "id": "f2123edb-d19b-5187-9a66-aa604ba190ab",
+      "name": "Webhook1",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        720,
+        480
+      ],
+      "webhookId": "fbf9950e-73de-4962-a636-ca182312c908"
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_005",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 542597216,
+          "mode": "list",
+          "cachedResultName": "Test_Finplan_2024",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_005/edit#gid=542597216"
+        },
+        "clear": "specificRange",
+        "range": "A2:Y"
+      },
+      "id": "7923fb78-2b4e-581d-800d-bd80d8353656",
+      "name": "Google Sheets2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.1,
+      "position": [
+        1104,
+        544
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Google Sheets"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "\tselect * from (\n\tselect \n\t\n\t\"source\",activity_id,entity,pool,cost_type,allocation_rule,responsible,who_added,service_description,income_expense,pl_account,\n\t\n\tl_detailed,\n\t--trim(both ' ' from l_detailed) as l_detailed,\n\t--trim(l_detailed) as l_detailed,\n\t\n\t\"month\",alloc_amt_usd,alloc_amt_usd_cons,alloc_amt_usd_opt,l1,l2,l3,l4,l5,l6,l_managements,\"version\",run_time,l_detailed\n\t\n\t\n\tfrom finplan_25.pl_data_h pd where \n\tcast(trim('V25_' from version) as decimal(REDACTED,0)) = (\n\tselect max (number) from (\n\tselect cast(number as decimal(REDACTED,0))from (\n\tselect distinct trim('V25_' from version) as number from finplan_25.pl_data_h) as pd) as max_version) \nand \"source\" <> 'PCC'\n\t) as pd",
+        "options": {}
+      },
+      "id": "c8d5f781-c088-5fce-85da-b52732b4b211",
+      "name": "FP 2025 version",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1280,
+        288
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "\tselect * from (\n\tselect \n\t\n\t\"source\",activity_id,entity,pool,cost_type,allocation_rule,responsible,who_added,service_description,income_expense,pl_account,\n\t\n\tl_detailed,\n\t--trim(both ' ' from l_detailed) as l_detailed,\n\t--trim(l_detailed) as l_detailed,\n\t\n\t\"month\",alloc_amt_usd,alloc_amt_usd_cons,alloc_amt_usd_opt,l1,l2,l3,l4,l5,l6,l_managements,\"version\",run_time,l_detailed\n\t\n\t\n\tfrom finplan_24.pl_data_h_24 pd where \n\tcast(trim('V_' from version) as decimal(REDACTED,0)) = (\n\tselect max (number) from (\n\tselect cast(number as decimal(REDACTED,0))from (\n\tselect distinct trim('V_' from version) as number from finplan_24.pl_data_h_24) as pd) as max_version) \nand \"source\" <> 'PCC'\n\t) as pd",
+        "options": {}
+      },
+      "id": "407eecf8-0472-591d-8519-94a0602323e6",
+      "name": "FP 2024 version",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1328,
+        544
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_005",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 542597216,
+          "mode": "list",
+          "cachedResultName": "Test_Finplan_2024",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_005/edit#gid=542597216"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Source": "={{ $json.source }}",
+            "Raw amount USD": "={{ $json.alloc_amt_usd }}",
+            "Conservative amount USD": "={{ $json.alloc_amt_usd_cons }}",
+            "Optimistic amount USD": "={{ $json.alloc_amt_usd_opt }}",
+            "Activity ID": "={{ $json.activity_id }}",
+            "Entity": "={{ $json.entity }}",
+            "Pool": "={{ $json.pool }}",
+            "Cost type": "={{ $json.cost_type }}",
+            "Allocation rule": "={{ $json.allocation_rule }}",
+            "Responsible": "={{ $json.responsible }}",
+            "Who added": "={{ $json.who_added }}",
+            "Service description": "={{ $json.service_description }}",
+            "Income / Expense": "={{ $json.income_expense }}",
+            "L detailed": "={{ $json.l_detailed }}",
+            "Month": "={{ $json.month }}",
+            "Account": "={{ $json.pl_account }}",
+            "L1": "={{ $json.l1 }}",
+            "L2": "={{ $json.l2 }}",
+            "L3": "={{ $json.l3 }}",
+            "L4": "={{ $json.l4 }}",
+            "L5": "={{ $json.l5 }}",
+            "L6": "={{ $json.l6 }}",
+            "L Managements": "={{ $json.l_managements }}",
+            "Version": "={{ $json.version }}",
+            "Run time": "={{ $json.run_time }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Activity ID",
+              "displayName": "Activity ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Entity",
+              "displayName": "Entity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Pool",
+              "displayName": "Pool",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cost type",
+              "displayName": "Cost type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Allocation rule",
+              "displayName": "Allocation rule",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Responsible",
+              "displayName": "Responsible",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Who added",
+              "displayName": "Who added",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service description",
+              "displayName": "Service description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Income / Expense",
+              "displayName": "Income / Expense",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Account",
+              "displayName": "Account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "L detailed",
+              "displayName": "L detailed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Month",
+              "displayName": "Month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Raw amount USD",
+              "displayName": "Raw amount USD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conservative amount USD",
+              "displayName": "Conservative amount USD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Optimistic amount USD",
+              "displayName": "Optimistic amount USD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "L1",
+              "displayName": "L1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "L2",
+              "displayName": "L2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "L3",
+              "displayName": "L3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "L4",
+              "displayName": "L4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "L5",
+              "displayName": "L5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "L6",
+              "displayName": "L6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "L Managements",
+              "displayName": "L Managements",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Version",
+              "displayName": "Version",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Run time",
+              "displayName": "Run time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e51c99e0-a0c3-575b-b65f-cba96a21eaef",
+      "name": "Google Sheets4",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.1,
+      "position": [
+        1504,
+        544
+      ],
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Google Sheets"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_005",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1117374017,
+          "mode": "list",
+          "cachedResultName": "FinPlan_2026",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_005/edit#gid=1117374017"
+        },
+        "clear": "specificRange",
+        "range": "A2:Y"
+      },
+      "id": "edbcda0a-9a55-5d29-a555-9a0990c4a0bb",
+      "name": "Google Sheets3",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.1,
+      "position": [
+        1072,
+        80
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_005",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1117374017,
+          "mode": "list",
+          "cachedResultName": "FinPlan_2026",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_005/edit#gid=1117374017"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Source": "={{ $json.source }}",
+            "Activity ID": "={{ $json.activity_id }}",
+            "Entity": "={{ $json.entity }}",
+            "Pool": "={{ $json.pool }}",
+            "Cost type": "={{ $json.cost_type }}",
+            "Allocation rule": "={{ $json.allocation_rule }}",
+            "Responsible": "={{ $json.responsible }}",
+            "Who added": "={{ $json.who_added }}",
+            "Service description": "={{ $json.service_description }}",
+            "Income / Expense": "={{ $json.income_expense }}",
+            "Account": "={{ $json.pl_account }}",
+            "Month": "={{ $json.month }}",
+            "L1": "={{ $json.l1 }}",
+            "L2": "={{ $json.l2 }}",
+            "L3": "={{ $json.l3 }}",
+            "L4": "={{ $json.l4 }}",
+            "L5": "={{ $json.l5 }}",
+            "L6": "={{ $json.l6 }}",
+            "L Managements": "={{ $json.l_managements }}",
+            "Version": "={{ $json.version }}",
+            "Run time": "={{ $json.run_time }}",
+            "L detailed": "={{ $json.l_detailed }}",
+            " Raw amount USD ": "={{ $json.alloc_amt_usd }}",
+            " Conservative amount USD ": "={{ $json.alloc_amt_usd_cons }}",
+            " Optimistic amount USD ": "={{ $json.alloc_amt_usd_opt }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Activity ID",
+              "displayName": "Activity ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Entity",
+              "displayName": "Entity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Pool",
+              "displayName": "Pool",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Cost type",
+              "displayName": "Cost type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Allocation rule",
+              "displayName": "Allocation rule",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Responsible",
+              "displayName": "Responsible",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Who added",
+              "displayName": "Who added",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Service description",
+              "displayName": "Service description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Income / Expense",
+              "displayName": "Income / Expense",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Account",
+              "displayName": "Account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "L detailed",
+              "displayName": "L detailed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Month",
+              "displayName": "Month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": " Raw amount USD ",
+              "displayName": " Raw amount USD ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": " Conservative amount USD ",
+              "displayName": " Conservative amount USD ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": " Optimistic amount USD ",
+              "displayName": " Optimistic amount USD ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "L1",
+              "displayName": "L1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "L2",
+              "displayName": "L2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "L3",
+              "displayName": "L3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "L4",
+              "displayName": "L4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "L5",
+              "displayName": "L5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "L6",
+              "displayName": "L6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "L Managements",
+              "displayName": "L Managements",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Version",
+              "displayName": "Version",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Run time",
+              "displayName": "Run time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "EOMonth for CF",
+              "displayName": "EOMonth for CF",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "EOMonth for PL",
+              "displayName": "EOMonth for PL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Is in FPS?",
+              "displayName": "Is in FPS?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Terms",
+              "displayName": "Terms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "6b5d2acc-d427-55ff-861b-73394725949e",
+      "name": "Google Sheets5",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.1,
+      "position": [
+        1504,
+        80
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "\tselect * from (\n\tselect \n\t\n\t\"source\",activity_id,entity,pool,cost_type,allocation_rule,responsible,who_added,service_description,income_expense,pl_account,\n\t\n\tl_detailed,\n\t--trim(both ' ' from l_detailed) as l_detailed,\n\t--trim(l_detailed) as l_detailed,\n\t\n\t\"month\",alloc_amt_usd,alloc_amt_usd_cons,alloc_amt_usd_opt,l1,l2,l3,l4,l5,l6,l_managements,\"version\",run_time,l_detailed\n\t\n\t\n\tfrom finplan.pl_data_h pd where \n\tcast(trim('V26_' from version) as decimal(REDACTED,0)) = (\n\tselect max (number) from (\n\tselect cast(number as decimal(REDACTED,0))from (\n\tselect distinct trim('V26_' from version) as number from finplan.pl_data_h) as pd) as max_version) \nand \"source\" <> 'PCC'\n\t) as pd",
+        "options": {}
+      },
+      "id": "b237d54d-a763-5da8-8000-a7c07630ae47",
+      "name": "FP 2026 version",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.3,
+      "position": [
+        1280,
+        80
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "FP 2025 version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "FP 2024 version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        []
+      ]
+    },
+    "FP 2025 version": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FP 2024 version": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "FP 2026 version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FP 2026 version": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "REDACTED",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REDACTED_INSTANCE_ID"
+  },
+  "nodeGroups": [],
+  "id": "REDACTED",
+  "tags": []
+}
