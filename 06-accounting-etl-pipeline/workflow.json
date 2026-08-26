@@ -1,0 +1,4731 @@
+{
+  "name": "Accounting to DWH via email CSV reader (DE)",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://gmail.googleapis.com/gmail/v1/users/me/messages/{{ $('Get Message1').item.json.id}}/attachments/{{ $json.attachmentId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "gmailOAuth2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        480
+      ],
+      "id": "d28aaf8d-38e0-5627-8d09-406ba569a02b",
+      "name": "Get Attachment",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REDACTED",
+          "name": "Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "delimiter": ";"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1792,
+        480
+      ],
+      "id": "fcc743b5-e0e0-59cc-8284-5f495487b1b9",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = [];\n\nfor (const item of items) {\n  const parts = item.json.payload?.parts || [];\n\n  for (const part of parts) {\n    if (part?.body?.attachmentId) {\n      output.push({\n        json: part.body\n      });\n    }\n  }\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        480
+      ],
+      "id": "aa42d72a-d757-5cdc-badb-f575617e194b",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "accounting",
+          "mode": "list",
+          "cachedResultName": "accounting"
+        },
+        "table": {
+          "__rl": true,
+          "value": "de_input_01",
+          "mode": "list",
+          "cachedResultName": "de_input_01"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "booking_id": "={{ $json['invoice number'] }}",
+            "date_of_booking": "={{ $json.date }}",
+            "name_of_account_eng": "=",
+            "t1a_account": "=",
+            "account": "={{ $json.account }}",
+            "dt_currency": "=",
+            "ct_currency": "=",
+            "currency": "={{ $json.currency }}",
+            "exchange_rate": "=",
+            "dt_pln": "={{ $json['revenue soll'] }}",
+            "ct_pln": "={{ $json['revenue haben'] }}",
+            "description": "={{ $json['posting text'] }}",
+            "register": "=",
+            "vendor": "=",
+            "vat": "="
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "booking_id",
+              "displayName": "booking_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date_of_booking",
+              "displayName": "date_of_booking",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name_of_account_eng",
+              "displayName": "name_of_account_eng",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "t1a_account",
+              "displayName": "t1a_account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "account",
+              "displayName": "account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "dt_currency",
+              "displayName": "dt_currency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ct_currency",
+              "displayName": "ct_currency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "currency",
+              "displayName": "currency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "exchange_rate",
+              "displayName": "exchange_rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "dt_pln",
+              "displayName": "dt_pln",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ct_pln",
+              "displayName": "ct_pln",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "register",
+              "displayName": "register",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "vendor",
+              "displayName": "vendor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "vat",
+              "displayName": "vat",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2224,
+        480
+      ],
+      "id": "338c429a-44c2-5900-af16-e33c7901d7f6",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "=https://gmail.googleapis.com/gmail/v1/users/me/messages/{{$('Gmail Trigger DE').item.json.id}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "gmailOAuth2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        896,
+        480
+      ],
+      "id": "3cc34be4-c178-58e1-aa4f-e625a59fe758",
+      "name": "Get Message1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REDACTED",
+          "name": "Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "if (!$json.data) {\n  throw new Error('No base64 data found in JSON input');\n}\n\n// Decode base64 string from JSON\nconst text = Buffer.from($json.data, 'base64').toString('utfREDACTED');\n\n// Remove line breaks inside quoted fields\nconst cleaned = text.replace(/\"([^\"]*)\"/gs, m =>\n  m.replace(/\\r?\\n/g, ' ')\n);\n\n// Remove empty lines\nconst finalText = cleaned\n  .split('\\n')\n  .filter(l => l.trim() !== '')\n  .join('\\n');\n\n// Return as proper binary so CSV node can read it\nreturn [{\n  binary: {\n    data: {\n      data: Buffer.from(finalText).toString('base64'),\n      mimeType: 'text/csv',\n      fileName: 'cleaned.csv',\n    },\n  },\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        480
+      ],
+      "id": "2be9f76b-ac3c-5578-9944-00cefdbd51c6",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7bd24b5d-72b6-4443-967c-2eREDACTEDabbab252d",
+              "leftValue": "={{ $json.N }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "6d88550f-6925-5cc4-baeb-d23b3248b33a",
+      "name": "Filter1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e754a908-e1fb-580d-9a6a-746730e9d68c",
+      "name": "Status Update step ",
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "={{ $json.N }}",
+            "Status": "To do"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        448,
+        0
+      ],
+      "id": "8e5fe246-e3bd-54eb-95c4-e70b7b09fae6",
+      "name": "Status Update step 3",
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "Done",
+            "N": "10",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Source": "=QB email from  {{ $json.From }}"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        0
+      ],
+      "id": "42c417de-12d6-58dd-8404-df6fbc82a346",
+      "name": "Update status1",
+      "retryOnFail": true,
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "20",
+            "Status": "Error",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA",
+            "Source": "=SQL script in nREDACTEDn"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        912,
+        304
+      ],
+      "id": "8a60dc03-c1ee-5ef0-b20b-c6ec52646c1b",
+      "name": "Update status 21",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "40",
+            "Status": "Done",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA",
+            "Source": "=Attached file from email"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2448,
+        240
+      ],
+      "id": "ac0a5af6-4900-5223-97bc-a26cf5978057",
+      "name": "Update status 22",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "40",
+            "Status": "Error",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA",
+            "Source": "=Attached file from email"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2448,
+        432
+      ],
+      "id": "76860019-7520-540b-a7fb-b5e051479102",
+      "name": "Update status 23",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1291063677,
+          "mode": "list",
+          "cachedResultName": "m_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=1291063677"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "A3:D"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2448,
+        624
+      ],
+      "id": "fba0c356-beb5-52a9-a495-5701917ee8cf",
+      "name": "Get CoA mapping",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_004",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 469243737,
+          "mode": "list",
+          "cachedResultName": "input_qb",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_004/edit#gid=469243737"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3792,
+        912
+      ],
+      "id": "3608cfdb-45ec-5b10-9ca1-f0838509cdc8",
+      "name": "Clear sheet input_qb",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 544841956,
+          "mode": "list",
+          "cachedResultName": "o_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=544REDACTED41956"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "distr_account",
+              "displayName": "distr_account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "distr_account_type",
+              "displayName": "distr_account_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "transaction_date",
+              "displayName": "transaction_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "transaction_type",
+              "displayName": "transaction_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "tr_number",
+              "displayName": "tr_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name_",
+              "displayName": "name_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "item_class",
+              "displayName": "item_class",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "memo_descr",
+              "displayName": "memo_descr",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "item_split_account_full_name",
+              "displayName": "item_split_account_full_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "amount",
+              "displayName": "amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "balance",
+              "displayName": "balance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "acc_name_t1a",
+              "displayName": "acc_name_t1a",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "bs_pl",
+              "displayName": "bs_pl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cash",
+              "displayName": "cash",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "account",
+              "displayName": "account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "l1",
+              "displayName": "l1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "l2",
+              "displayName": "l2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "l3",
+              "displayName": "l3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "l4",
+              "displayName": "l4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "l5",
+              "displayName": "l5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "l6",
+              "displayName": "l6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "eop_yyyy_mm",
+              "displayName": "eop_yyyy_mm",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "eop_yyyy",
+              "displayName": "eop_yyyy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4688,
+        944
+      ],
+      "id": "cacf7145-fa72-5d63-a895-c9ea6ef92b5e",
+      "name": "Insert data input_qb1",
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "--форматирую данные в нужный формат\n--drop table if exists accounting.de_input_02;\n--Удаление существующего года\nDELETE FROM accounting.de_input_02\nWHERE EXTRACT(YEAR FROM transaction_date) = '{{ $('Edit Fields').item.json.year }}'\n;\n\n--\n\n--CREATE TABLE IF NOT EXISTS accounting.de_input_02 AS \ninsert into accounting.de_input_02\n(\nSELECT \n    account AS distr_account,\n    NULL AS distr_account_type,\n    CASE\n        WHEN date_of_booking ~ '^[0-9]+(\\.[0-9]+)?$'\n            THEN DATE '1REDACTED99-12-30' + (date_of_booking::numeric)::int\n        ELSE to_date(date_of_booking, 'DD.MM.YYYY')\n    END AS transaction_date,\n    NULL AS transaction_type,\n    booking_id AS tr_number,\n    NULL AS name_,\n    NULL AS item_class,\n    description AS memo_descr,\n    vendor AS item_split_account_full_name,\n    (\n    COALESCE(\n        CAST(\n            REPLACE(\n                REPLACE(\n                    REPLACE(NULLIF(ct_pln, ''), '$', ''),\n                    '.', ''\n                ),\n                ',', '.'\n            ) AS numeric\n        ),\n        0\n    )\n    -\n    COALESCE(\n        CAST(\n            REPLACE(\n                REPLACE(\n                    REPLACE(NULLIF(dt_pln, ''), '$', ''),\n                    '.', ''\n                ),\n                ',', '.'\n            ) AS numeric\n        ),\n        0\n    )\n) AS amount\n,\n    NULL AS balance\nFROM accounting.de_input_01\n);\n\n--\nselect * from accounting.de_input_02\nlimit 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        4016,
+        912
+      ],
+      "id": "82f9fb46-0d47-51ee-b950-b1c92869872b",
+      "name": "Format data accounting.de_input_1",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "--Таблица с полным данными для выгрузки\ndrop table if exists accounting.de_01;\n--\nCREATE TABLE if not exists accounting.de_01 as (\nselect\n\tinput_02.distr_account,\n\tinput_02.distr_account_type,\n\tinput_02.transaction_date::date,\n\tinput_02.transaction_type,\n\tinput_02.tr_number,\n\tinput_02.name_,\n\tinput_02.item_class,\n\tinput_02.memo_descr,\n\tinput_02.item_split_account_full_name,\n\tinput_02.amount * coalesce(coalesce(map_02.sign_,map_01.sign_), 1) as amount,\n\tinput_02.balance,\n\tcao.acc_name_t1a,\n\tcao.bs_pl,\n\tcao.cash,\n\tplan_cao.id,\n\tplan_cao.account,\n\tplan_cao.l1,\n\tplan_cao.l2,\n\tplan_cao.l3,\n\tplan_cao.l4,\n\tplan_cao.l5,\n\tplan_cao.l6,\n\t'm' || TO_CHAR(input_02.transaction_date, 'YYYY-MM') as eop_yyyy_mm,\n\t'y' || TO_CHAR(input_02.transaction_date, 'YYYY') as eop_yyyy\n\t--plan_cao.project_efficiency_mapping\nfrom accounting.de_input_02 as input_02\nleft join --план счетов\n\t\t(select distinct on (acc_name_qb)\n\t\t\tacc_name_qb,\n\t\t\tacc_name_t1a,\n\t\t\tbs_pl,\n\t\t\tcash \n\t\tfrom accounting.de_cao_01) as cao\n\ton input_02.distr_account = cao.acc_name_qb\nleft join --маппинг иерархии счетов\n\t\t(SELECT DISTINCT ON (account)\n\t\t    id,\n\t\t    account,\n\t\t    l1,\n\t\t    l2,\n\t\t    l3,\n\t\t    l4,\n\t\t    l5,\n\t\t    l6\n\t\tFROM mrp.account_hier\n\t\tORDER BY account)\n\tas plan_cao\n\ton cao.acc_name_t1a = plan_cao.account\nleft join --маппинг исключений по знаку #1\n\t\t(SELECT DISTINCT ON (transaction_type)\n\t\t    transaction_type,\n\t\t    sign_::decimal as sign_\n\t\tFROM accounting.de_map_01\n\t\tORDER BY transaction_type)\n\tas map_01\n\ton input_02.transaction_type = map_01.transaction_type\nleft join --маппинг исключений по счету #2\n\t\t(SELECT DISTINCT ON (account)\n\t\t    account,\n\t\t    sign_::decimal as sign_\n\t\tFROM accounting.de_map_02\n\t\tORDER BY account)\n\tas map_02\n\ton input_02.distr_account = map_02.account\nwhere input_02.transaction_date >= '2025-01-01'\n\tand amount <> 0\n);\n--\nselect * from accounting.de_01\n--limit 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        4464,
+        944
+      ],
+      "id": "04929b6e-b93a-5550-ba07-d49ada6b12bf",
+      "name": "Create table accounting.de_1",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "50",
+            "Status": "Done",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2896,
+        336
+      ],
+      "id": "daeac1f4-05b7-56ac-af4b-eee5123904de",
+      "name": "Update status 24",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "60",
+            "Status": "Done",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA",
+            "Source": "accounting.de_input_01"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4240,
+        624
+      ],
+      "id": "23f192bf-efe2-5a86-b6d9-04b041a12b5c",
+      "name": "Update status 25",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "REDACTED0",
+            "Status": "Done",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4912,
+        656
+      ],
+      "id": "2149b517-562d-555b-b137-4f9ead50261b",
+      "name": "Update status 26",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "REDACTED0",
+            "Status": "Error",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4912,
+        848
+      ],
+      "id": "7d10c5bc-57cb-596f-b256-301dff21fef3",
+      "name": "Update status 27",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 544841956,
+          "mode": "list",
+          "cachedResultName": "o_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=544REDACTED41956"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4240,
+        1008
+      ],
+      "id": "24f235c7-d1f4-50ea-8c2b-4285f24b5785",
+      "name": "Clear o_DE1",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "51",
+            "Status": "Done",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3344,
+        432
+      ],
+      "id": "edabb949-3137-560f-9631-54354a264a45",
+      "name": "Update status 28",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1291063677,
+          "mode": "list",
+          "cachedResultName": "m_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=1291063677"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "K3:L"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3344,
+        816
+      ],
+      "id": "e7c52ee7-2834-55b6-af9b-4506d8f7826b",
+      "name": "Get CoA mapping4",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "52",
+            "Status": "Done",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3792,
+        528
+      ],
+      "id": "192673b2-f65f-5817-8551-e0a2c7186a43",
+      "name": "Update status 29",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1291063677,
+          "mode": "list",
+          "cachedResultName": "m_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=1291063677"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "H3:I"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2896,
+        720
+      ],
+      "id": "fc6bb195-1e3f-5d01-b932-efe73a2032c4",
+      "name": "Get mapping_",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "accounting",
+          "mode": "list",
+          "cachedResultName": "accounting"
+        },
+        "table": {
+          "__rl": true,
+          "value": "de_map_01",
+          "mode": "list",
+          "cachedResultName": "de_map_01"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "transaction_type": "={{ $json.transaction_type }}",
+            "sign_": "={{ $json.sign_ }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "transaction_type",
+              "displayName": "transaction_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sign_",
+              "displayName": "sign_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        3120,
+        720
+      ],
+      "id": "ca4a31d2-c3f7-58f9-961b-5a8f4aed18b7",
+      "name": "Insert rows in a de_map_",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "accounting",
+          "mode": "list",
+          "cachedResultName": "accounting"
+        },
+        "table": {
+          "__rl": true,
+          "value": "de_map_02",
+          "mode": "list",
+          "cachedResultName": "de_map_02"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "account": "={{ $json.account }}",
+            "sign_": "={{ $json.sign_ }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "account",
+              "displayName": "account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sign_",
+              "displayName": "sign_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        3568,
+        816
+      ],
+      "id": "2ad9870c-9032-5b41-bbe6-1258e75e7223",
+      "name": "Insert rows in a de_map_2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 684080089,
+          "mode": "list",
+          "cachedResultName": "mrp_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=6REDACTED40REDACTED00REDACTED9"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "transaction_date",
+              "displayName": "transaction_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "eop_yyyy_mm",
+              "displayName": "eop_yyyy_mm",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "eop_yyyy",
+              "displayName": "eop_yyyy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "l6",
+              "displayName": "l6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "memo_descr",
+              "displayName": "memo_descr",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "amount",
+              "displayName": "amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source_",
+              "displayName": "source_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        5360,
+        960
+      ],
+      "id": "577a452f-f48f-58af-99c9-6965aa3d2c7f",
+      "name": "Insert data input_qb4",
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 684080089,
+          "mode": "list",
+          "cachedResultName": "mrp_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=6REDACTED40REDACTED00REDACTED9"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4912,
+        1040
+      ],
+      "id": "4caf6f1b-7661-5ea1-b879-422b863d2afc",
+      "name": "Clear mrp_DE1",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "--сверка с mrp\nwith mrp as \n\t\t(select \n\t\tu02.\"Reporting Month\" as transaction_date,\n\t\t'm' || TO_CHAR(u02.\"Reporting Month\", 'YYYY-MM') as eop_yyyy_mm,\n\t\t'y' || TO_CHAR(u02.\"Reporting Month\", 'YYYY') as eop_yyyy,\n\t\tu02.l6,\n\t\tu02.\"Description\" as memo_descr,\n\t\tcoalesce(round(sum(u02.\"USD\" / fx.fx_to_usd ),2), 0) * (1) as amount,\n\t\t--'MRP' as source_,\n\t\tu02.l4,\n\t\tu02.\"Account\" as account_t1a\n\t\tfrom mrp.union_02 as u02\n\t\tleft join project_result.fx as fx\n\t\t\ton 'EUR' = fx.currency \n\t\t\tand u02.\"Reporting Month\" = fx.reporting_month \n\t\twhere \"Payer\" = 'ACME DE'\n\t\t\tand \"Reporting Month\" >= '2025-01-01'\n\t\tgroup by\n\t\t\ttransaction_date,\n\t\t\teop_yyyy_mm,\n\t\t\teop_yyyy,\n\t\t\tl6,\n\t\t\tmemo_descr,\n\t\t\tl4,\n\t\t\taccount_t1a\n\t\t\t),\n\taccounting as \n\t\t(select \n\t\ttransaction_date,\n\t\teop_yyyy_mm,\n\t\teop_yyyy,\n\t\tl6,\n\t\tmemo_descr,\n\t\tsum(amount) as amount,\n\t\t--'Accounting' as source_,\n\t\tl4,\n\t\taccount as account_t1a\t\t\n\t\tfrom accounting.de_01\n\t\twhere l2 = 'Retained Earnings'\n\t\t\tand transaction_date >= '2025-01-01'\n\t\tgroup by\n\t\t\ttransaction_date,\n\t\t\teop_yyyy_mm,\n\t\t\teop_yyyy,\n\t\t\tl6,\n\t\t\tmemo_descr,\n\t\t\tl4,\n\t\t\taccount_t1a\n\t\t)\n(select *, '2.MRP' as source_  from mrp\n\tunion all\nselect *, '1.Accounting' as source_  from accounting\n\tunion all\nselect transaction_date,\n\t\teop_yyyy_mm,\n\t\teop_yyyy,\n\t\tl6,\n\t\tmemo_descr,\n\t\tamount * (-1) as amount,\n\t\tl4,\n\t\taccount_t1a,\n\t\t'3.diff' as source_\n\tfrom mrp\n\tunion all\nselect *, '3.diff' as source_  from accounting\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        5136,
+        960
+      ],
+      "id": "c0eec97f-66fd-5803-8896-e3566a97d70e",
+      "name": "Get MRP vs Accounting1",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "REDACTED1",
+            "Status": "Done",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        5584,
+        672
+      ],
+      "id": "cf8ebb18-2f5e-5368-8dd2-11196852e53d",
+      "name": "Update status 30",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 31603979,
+          "mode": "list",
+          "cachedResultName": "er_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=31603979"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "distr_account",
+              "displayName": "distr_account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "l5",
+              "displayName": "l5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "l6",
+              "displayName": "l6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        6032,
+        1152
+      ],
+      "id": "36c7c74f-a9ac-5319-9d6d-948ac95f812d",
+      "name": "Insert data input_qb5",
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "70",
+            "Status": "Done",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        6256,
+        1200
+      ],
+      "id": "8e1f28a3-2fc9-5b0c-b137-9b35cdf4a80c",
+      "name": "Update status 31",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 31603979,
+          "mode": "list",
+          "cachedResultName": "er_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=31603979"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        5584,
+        1056
+      ],
+      "id": "d319e47e-ddd3-5b73-ad05-5d7d96b9108a",
+      "name": "Clear er_DE1",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "--Ошибки в маппинге\nselect distinct on (distr_account)\n\tdistr_account,\n\tl5,\n\tl6\nfrom accounting.de_01\nwhere --l2 = 'Retained Earnings'\n\t--and \n  (l6 is null or l6 = '');",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        5808,
+        1152
+      ],
+      "id": "cf7b3cad-0c84-5ddf-aafd-f9bcb3fe6374",
+      "name": "CAO errors1",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "60",
+            "Status": "Error",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA",
+            "Source": "accounting.de_input_01"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4240,
+        816
+      ],
+      "id": "1e80d5ae-e60c-5596-911e-44b22a7b3af5",
+      "name": "Update status 32",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "REDACTED1",
+            "Status": "Error",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        5584,
+        864
+      ],
+      "id": "21a23d81-59fc-584e-8ef0-b9c9e7048d86",
+      "name": "Update status 33",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "70",
+            "Status": "Error",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        6256,
+        1008
+      ],
+      "id": "bea033db-21e2-5e0d-b7fa-66f3d11ee4f8",
+      "name": "Update status 34",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "50",
+            "Status": "Error",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2896,
+        528
+      ],
+      "id": "be74ae30-2f80-511d-8fc3-4e215fbcdf0c",
+      "name": "Update status 35",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "51",
+            "Status": "Error",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3344,
+        624
+      ],
+      "id": "484d2e83-17a5-5f82-aa8f-bbd635fac4f6",
+      "name": "Update status 36",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "52",
+            "Status": "Error",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3792,
+        720
+      ],
+      "id": "013d54cd-a3ba-505e-8377-4dba9607cb64",
+      "name": "Update status 37",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "90",
+            "Status": "Done",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        7152,
+        1392
+      ],
+      "id": "1445b200-dfb6-5623-9362-e2b3716016a1",
+      "name": "Update status 38",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "90",
+            "Status": "Error",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        7152,
+        1200
+      ],
+      "id": "5a3ff862-dbb4-54c7-919f-1979c44bb8e0",
+      "name": "Update status 39",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 571855350,
+          "mode": "list",
+          "cachedResultName": "hv_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=571REDACTED55350"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        6480,
+        1200
+      ],
+      "id": "24d8e86b-7f61-5396-b189-795215aa2a44",
+      "name": "Clear hv_DE1",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- 1. Создание первичной таблицы истории (однократный запуск)\nCREATE TABLE IF NOT EXISTS accounting.de_01_h AS\nSELECT\n    distr_account,\n    transaction_date,\n    tr_number,\n    SUM(amount) AS amount,\n    acc_name_t1a,\n    account,\n    l2,\n    l3,\n    l4,\n    l5,\n    l6,\n    eop_yyyy_mm,\n    eop_yyyy,\n    to_char(now(), '\"v_\"YYYY-MM-DD:HH24-MI') AS version_,\n    'initial' AS action_\nFROM accounting.de_01\nWHERE l2 = 'Retained Earnings'\nGROUP BY\n    distr_account,\n    transaction_date,\n    tr_number,\n    acc_name_t1a,\n    account,\n    l2,\n    l3,\n    l4,\n    l5,\n    l6,\n    eop_yyyy_mm,\n    eop_yyyy;\n\n-- Индекс по ключу для производительности\nCREATE INDEX IF NOT EXISTS de_01_h_key_idx\n    ON accounting.de_01_h (\n        distr_account,\n        transaction_date,\n        tr_number,\n        acc_name_t1a,\n        account,\n        l2,\n        l3,\n        l4,\n        l5,\n        l6,\n        eop_yyyy_mm,\n        eop_yyyy\n    );\n-- Для удобства — материализуем текущий \"срез\" с агрегированием\n-- только по нужным колонкам и l2 = 'Retained Earn'\nWITH params AS (\n    SELECT to_char(now(), '\"v_\"YYYY-MM-DD:HH24-MI') AS v\n),\n\ncurr_agg AS (\n    SELECT\n        distr_account,\n        transaction_date,\n        tr_number,\n        SUM(amount) AS amount,\n        acc_name_t1a,\n        account,\n        l2,\n        l3,\n        l4,\n        l5,\n        l6,\n        eop_yyyy_mm,\n        eop_yyyy\n    FROM accounting.de_01\n    WHERE l2 = 'Retained Earnings'\n    GROUP BY\n        distr_account,\n        transaction_date,\n        tr_number,\n        acc_name_t1a,\n        account,\n        l2,\n        l3,\n        l4,\n        l5,\n        l6,\n        eop_yyyy_mm,\n        eop_yyyy\n),\n\n-- 2. Агрегированное итоговое состояние истории по тем же колонкам\nhist_agg AS (\n    SELECT\n        distr_account,\n        transaction_date,\n        tr_number,\n        SUM(amount) AS amount,\n        acc_name_t1a,\n        account,\n        l2,\n        l3,\n        l4,\n        l5,\n        l6,\n        eop_yyyy_mm,\n        eop_yyyy\n    FROM accounting.de_01_h\n    GROUP BY\n        distr_account,\n        transaction_date,\n        tr_number,\n        acc_name_t1a,\n        account,\n        l2,\n        l3,\n        l4,\n        l5,\n        l6,\n        eop_yyyy_mm,\n        eop_yyyy\n),\n\n-- 3. Новые строки (initial): есть в curr_agg, но нет в hist_agg\nnew_rows AS (\n    SELECT\n        c.distr_account,\n        c.transaction_date,\n        c.tr_number,\n        c.amount,\n        c.acc_name_t1a,\n        c.account,\n        c.l2,\n        c.l3,\n        c.l4,\n        c.l5,\n        c.l6,\n        c.eop_yyyy_mm,\n        c.eop_yyyy,\n        p.v AS version_,\n        'initial' AS action_\n    FROM curr_agg c\n    CROSS JOIN params p\n    LEFT JOIN hist_agg h\n      ON h.distr_account   = c.distr_account\n     AND h.transaction_date = c.transaction_date\n     AND h.tr_number       = c.tr_number\n     AND h.acc_name_t1a    = c.acc_name_t1a\n     AND h.account         = c.account\n     AND h.l2              = c.l2\n     AND h.l3              = c.l3\n     AND h.l4              = c.l4\n     AND h.l5              = c.l5\n     AND h.l6              = c.l6\n     AND h.eop_yyyy_mm     = c.eop_yyyy_mm\n     AND h.eop_yyyy        = c.eop_yyyy\n    WHERE h.distr_account IS NULL\n),\n\n-- 4. Удалённые строки (delete): есть в hist_agg, но нет в curr_agg\ndeleted_rows AS (\n    SELECT\n        h.distr_account,\n        h.transaction_date,\n        h.tr_number,\n        -h.amount AS amount,  -- обратный знак агрегированной суммы\n        h.acc_name_t1a,\n        h.account,\n        h.l2,\n        h.l3,\n        h.l4,\n        h.l5,\n        h.l6,\n        h.eop_yyyy_mm,\n        h.eop_yyyy,\n        p.v AS version_,\n        'delete' AS action_\n    FROM hist_agg h\n    CROSS JOIN params p\n    LEFT JOIN curr_agg c\n      ON c.distr_account   = h.distr_account\n     AND c.transaction_date = h.transaction_date\n     AND c.tr_number       = h.tr_number\n     AND c.acc_name_t1a    = h.acc_name_t1a\n     AND c.account         = h.account\n     AND c.l2              = h.l2\n     AND c.l3              = h.l3\n     AND c.l4              = h.l4\n     AND c.l5              = h.l5\n     AND c.l6              = h.l6\n     AND c.eop_yyyy_mm     = h.eop_yyyy_mm\n     AND c.eop_yyyy        = h.eop_yyyy\n    WHERE c.distr_account IS NULL\n),\n\n-- 5. Изменённые строки (correction):\n-- ключ есть и там, и там, но хотя бы одно поле отличается.\n-- amount = Δ между текущим агрегатом и агрегированной историей.\nchanged_rows AS (\n    SELECT\n        c.distr_account,\n        c.transaction_date,\n        c.tr_number,\n        (c.amount - h.amount) AS amount,  -- дельта суммы\n        c.acc_name_t1a,\n        c.account,\n        c.l2,\n        c.l3,\n        c.l4,\n        c.l5,\n        c.l6,\n        c.eop_yyyy_mm,\n        c.eop_yyyy,\n        p.v AS version_,\n        'correction' AS action_\n    FROM curr_agg c\n    JOIN hist_agg h\n      ON h.distr_account   = c.distr_account\n     AND h.transaction_date = c.transaction_date\n     AND h.tr_number       = c.tr_number\n     AND h.acc_name_t1a    = c.acc_name_t1a\n     AND h.account         = c.account\n     AND h.l2              = c.l2\n     AND h.l3              = c.l3\n     AND h.l4              = c.l4\n     AND h.l5              = c.l5\n     AND h.l6              = c.l6\n     AND h.eop_yyyy_mm     = c.eop_yyyy_mm\n     AND h.eop_yyyy        = c.eop_yyyy\n    CROSS JOIN params p\n    WHERE\n        c.amount          IS DISTINCT FROM h.amount OR\n        c.acc_name_t1a    IS DISTINCT FROM h.acc_name_t1a OR\n        c.account         IS DISTINCT FROM h.account OR\n        c.l2              IS DISTINCT FROM h.l2 OR\n        c.l3              IS DISTINCT FROM h.l3 OR\n        c.l4              IS DISTINCT FROM h.l4 OR\n        c.l5              IS DISTINCT FROM h.l5 OR\n        c.l6              IS DISTINCT FROM h.l6 OR\n        c.eop_yyyy_mm     IS DISTINCT FROM h.eop_yyyy_mm OR\n        c.eop_yyyy        IS DISTINCT FROM h.eop_yyyy\n)\n\n-- 6. Вставка всех изменений в историю\nINSERT INTO accounting.de_01_h (\n    distr_account,\n    transaction_date,\n    tr_number,\n    amount,\n    acc_name_t1a,\n    account,\n    l2,\n    l3,\n    l4,\n    l5,\n    l6,\n    eop_yyyy_mm,\n    eop_yyyy,\n    version_,\n    action_\n)\nSELECT * FROM new_rows\nUNION ALL\nSELECT * FROM deleted_rows\nUNION ALL\nSELECT * FROM changed_rows;\n--\n-- 1. Добавляем новую колонку, если её ещё нет\nALTER TABLE accounting.de_01_h\nADD COLUMN IF NOT EXISTS version_type text;\n\nALTER TABLE accounting.de_01_h\nADD COLUMN IF NOT EXISTS action_h text;\n\n-- 2. Ставим всем по умолчанию 'previous'\nUPDATE accounting.de_01_h\nSET version_type = '1.Previous',\n\taction_h = 'initial';\n\n-- 3. Находим самую последнюю версию\nWITH latest AS (\n    SELECT MAX(version_) AS max_version\n    FROM accounting.de_01_h\n)\n\n-- 4. Для строк с этой версией проставляем 'current'\nUPDATE accounting.de_01_h h\nSET version_type = '2.New',\n\taction_h = action_\nFROM latest l\nWHERE h.version_ = l.max_version;\n--\nselect * from accounting.de_01_h;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        6704,
+        1296
+      ],
+      "id": "57acb267-5db2-5327-bdb8-97e7bcae1f43",
+      "name": "Update accounting.de_01_h1",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 571855350,
+          "mode": "list",
+          "cachedResultName": "hv_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=571REDACTED55350"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        6928,
+        1296
+      ],
+      "id": "f4324f34-a683-5ea3-8776-2240823315a8",
+      "name": "Insert data hv_DE1",
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_003",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 933915568,
+          "mode": "list",
+          "cachedResultName": "d_DE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_003/edit#gid=93391556REDACTED"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N": "20",
+            "Status": "Done",
+            "Date": "={{ $now.format('yyyy-MM-dd hh:mm') }}",
+            "Webhook": "NA",
+            "Source": "=SQL script in nREDACTEDn"
+          },
+          "matchingColumns": [
+            "N"
+          ],
+          "schema": [
+            {
+              "id": "N",
+              "displayName": "N",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Step",
+              "displayName": "Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Webhook",
+              "displayName": "Webhook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        912,
+        112
+      ],
+      "id": "c88ee05a-1e5e-5af0-8b44-cf98bf5396e7",
+      "name": "Update status ",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "accounting",
+          "mode": "list",
+          "cachedResultName": "accounting"
+        },
+        "table": {
+          "__rl": true,
+          "value": "de_cao_01",
+          "mode": "list",
+          "cachedResultName": "de_cao_01"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "acc_name_qb": "={{ $json['Account name (QB)'] }}",
+            "acc_name_t1a": "={{ $json['Account (from Hier)'] }}",
+            "bs_pl": "={{ $json['BS/PL'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "acc_name_qb",
+              "displayName": "acc_name_qb",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "acc_name_t1a",
+              "displayName": "acc_name_t1a",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "bs_pl",
+              "displayName": "bs_pl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cash",
+              "displayName": "cash",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2672,
+        624
+      ],
+      "id": "064b9d65-bf32-5f9e-b004-3ac6e154a908",
+      "name": "Insert rows in a de_cao_",
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4c0a40b1-3020-4REDACTED25-9703-606b97f2e24e",
+              "name": "year",
+              "value": "={{ $input.first().json.snippet.split('*')[1].trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "a9ea3096-90cREDACTED-4447-a3e7-ad0d5REDACTEDdb5fda",
+              "name": "sheetname",
+              "value": "={{ $input.first().json.snippet.split('*')[2].trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -304,
+        64
+      ],
+      "id": "2c870b67-148b-5617-a7fc-1f1d0a6350b7",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => {\n  const cleaned = {};\n  for (const [key, value] of Object.entries(item.json)) {\n    const newKey = key.trim().replace(/^[\\/\\\\]+|[\\/\\\\]+$/g, '').trim();\n    cleaned[newKey] = value;\n  }\n  return { json: cleaned };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        480
+      ],
+      "id": "7b1cc0a1-a877-56fe-b158-a06077844d7f",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "labelIds": [
+            "Label_195755341REDACTED03121REDACTEDREDACTED79"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -720,
+        64
+      ],
+      "id": "46482f7d-2ddf-5f2c-a6fd-6d2ee2175db9",
+      "name": "Gmail Trigger DE",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REDACTED",
+          "name": "Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "--создание таблицы для Канады по входящим транзакциям\ndrop table if exists accounting.de_input_01;\n--\nCREATE TABLE IF NOT EXISTS accounting.de_input_01 (\n    booking_id           text,\n    date_of_booking      text,\n    name_of_account_eng  text,\n    t1a_account          text,\n    account              text,\n    dt_currency          text,\n    ct_currency          text,\n    currency             text,\n    exchange_rate        text,\n    dt_pln               text,\n    ct_pln               text,\n    description          text,\n    register             text,\n    vendor               text,\n    vat                  text\n);\n\n\n--создание таблицы маппинга для на счет ACME\ndrop table if exists accounting.de_cao_01;\n--\nCREATE TABLE if not exists accounting.de_cao_01 (\nacc_name_qb text,\nacc_name_t1a text,\nbs_pl text,\ncash text\n);\n\n--Создание таблицы исключений №1 для маппинга знака по типу транзакции\ndrop table if exists accounting.de_map_01;\n--\nCREATE TABLE if not exists accounting.de_map_01 (\ntransaction_type text,\nsign_ text\n);\n\n--Создание таблицы исключений №2 для маппинга знака по счету\ndrop table if exists accounting.de_map_02;\n--\nCREATE TABLE if not exists accounting.de_map_02 (\naccount text,\nsign_ text\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        672,
+        192
+      ],
+      "id": "6590a785-8ac8-58cc-b813-14471116f41d",
+      "name": "Create tables for DE",
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "--форматирую данные в нужный формат\n--drop table if exists accounting.de_input_02;\n--Удаление существующего года\nDELETE FROM accounting.de_input_02\nWHERE EXTRACT(YEAR FROM transaction_date) = SPLIT_PART('{{ $('Edit Fields').item.json.year }}', '_', 1)::INT\n  AND EXTRACT(MONTH FROM transaction_date) = SPLIT_PART('{{ $('Edit Fields').item.json.year }}', '_', 2)::INT;\n\n--\n\n--CREATE TABLE IF NOT EXISTS accounting.de_input_02 AS \ninsert into accounting.de_input_02\n(\nSELECT \n    account AS distr_account,\n    NULL AS distr_account_type,\n    CASE\n        WHEN date_of_booking ~ '^[0-9]+(\\.[0-9]+)?$'\n            THEN DATE '1REDACTED99-12-30' + (date_of_booking::numeric)::int\n        ELSE to_date(date_of_booking, 'DD.MM.YYYY')\n    END AS transaction_date,\n    NULL AS transaction_type,\n    booking_id AS tr_number,\n    NULL AS name_,\n    NULL AS item_class,\n    description AS memo_descr,\n    vendor AS item_split_account_full_name,\n    (COALESCE(CAST(REPLACE(REPLACE(NULLIF(ct_pln, ''), '$', ''), ',', '') AS numeric), 0)\n     -\n     COALESCE(CAST(REPLACE(REPLACE(NULLIF(dt_pln, ''), '$', ''), ',', '') AS numeric), 0))\n        AS amount,\n    NULL AS balance\nFROM accounting.de_input_01\n);\n\n--\nselect * from accounting.de_input_02\nlimit 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        4016,
+        1184
+      ],
+      "id": "e4809192-6819-5d12-9a85-a465d4e6563a",
+      "name": "Format data accounting.de_input_",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      },
+      "disabled": true,
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get Attachment": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Get Attachment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Message1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Update status 22",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get CoA mapping",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update status 23",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Status Update step 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status Update step ": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status Update step 3": {
+      "main": [
+        [
+          {
+            "node": "Create tables for DE",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update status1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get CoA mapping": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a de_cao_",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear sheet input_qb": {
+      "main": [
+        [
+          {
+            "node": "Format data accounting.de_input_1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert data input_qb1": {
+      "main": [
+        [
+          {
+            "node": "Update status 26",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Clear mrp_DE1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update status 27",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format data accounting.de_input_1": {
+      "main": [
+        [
+          {
+            "node": "Update status 25",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Clear o_DE1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update status 32",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create table accounting.de_1": {
+      "main": [
+        [
+          {
+            "node": "Insert data input_qb1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear o_DE1": {
+      "main": [
+        [
+          {
+            "node": "Create table accounting.de_1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update status 27",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get CoA mapping4": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a de_map_2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get mapping_": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a de_map_",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a de_map_": {
+      "main": [
+        [
+          {
+            "node": "Update status 2REDACTED",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get CoA mapping4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update status 36",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a de_map_2": {
+      "main": [
+        [
+          {
+            "node": "Update status 29",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Clear sheet input_qb",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update status 37",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert data input_qb4": {
+      "main": [
+        [
+          {
+            "node": "Update status 30",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Clear er_DE1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update status 33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear mrp_DE1": {
+      "main": [
+        [
+          {
+            "node": "Get MRP vs Accounting1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update status 33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get MRP vs Accounting1": {
+      "main": [
+        [
+          {
+            "node": "Insert data input_qb4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert data input_qb5": {
+      "main": [
+        [
+          {
+            "node": "Update status 31",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update status 34",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update status 31": {
+      "main": [
+        [
+          {
+            "node": "Clear hv_DE1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear er_DE1": {
+      "main": [
+        [
+          {
+            "node": "CAO errors1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update status 34",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CAO errors1": {
+      "main": [
+        [
+          {
+            "node": "Insert data input_qb5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear hv_DE1": {
+      "main": [
+        [
+          {
+            "node": "Update accounting.de_01_h1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update status 39",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update accounting.de_01_h1": {
+      "main": [
+        [
+          {
+            "node": "Insert data hv_DE1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert data hv_DE1": {
+      "main": [
+        [
+          {
+            "node": "Update status 3REDACTED",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update status 39",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a de_cao_": {
+      "main": [
+        [
+          {
+            "node": "Update status 24",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get mapping_",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update status 35",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Status Update step ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger DE": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create tables for DE": {
+      "main": [
+        [
+          {
+            "node": "Get Message1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update status ",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update status 21",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "RI9tREDACTEDHHHnVM6oSsREDACTED",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "REDACTED",
+  "meta": {
+    "instanceId": "REDACTED_INSTANCE_ID"
+  },
+  "nodeGroups": [],
+  "id": "REDACTED",
+  "tags": [
+    {
+      "updatedAt": "2026-07-21T06:40:31.052Z",
+      "createdAt": "2026-07-21T06:40:31.052Z",
+      "id": "yWVxr9ODN3PrUTUn",
+      "name": "AccountingDWH"
+    }
+  ]
+}
