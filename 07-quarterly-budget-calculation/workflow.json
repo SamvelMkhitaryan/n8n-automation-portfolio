@@ -1,0 +1,1530 @@
+{
+  "name": "Quarter Budget BP Calculation",
+  "nodes": [
+    {
+      "parameters": {
+        "events": [
+          "comment_created"
+        ],
+        "additionalFields": {
+          "filter": "project = SD AND created >= \"2026-01-01\" AND created <= \"2026-12-31\" AND \"request type\" = \"Bill Payment (SD)\" ORDER BY created DESC"
+        }
+      },
+      "type": "n8n-nodes-base.jiraTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -3104,
+        -736
+      ],
+      "id": "866fc6f8-46c0-58e8-9544-bdd21518f370",
+      "name": "Jira Trigger",
+      "webhookId": "2b26565c-bf4f-49c0-9e6e-5cb8123e5a8b",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdREDACTEDd75REDACTEDb-b7dREDACTED-412REDACTED-93d3-2REDACTEDc65REDACTEDec7REDACTED51",
+              "leftValue": "={{ $json.operover }}",
+              "rightValue": "Overhead",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "9af2d3e6-a305-42REDACTEDa-b372-cce9REDACTEDaf1403f",
+              "leftValue": "={{ $json.state.answers['53'].date }}",
+              "rightValue": "2026-01-01T00:00:00",
+              "operator": {
+                "type": "dateTime",
+                "operation": "afterOrEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        464,
+        -768
+      ],
+      "id": "fc17dca6-5466-5672-8cc3-b8c588b97801",
+      "name": "If Overhead"
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "value": "q_budget",
+          "mode": "list",
+          "cachedResultName": "q_budget"
+        },
+        "table": {
+          "__rl": true,
+          "value": "q3_2026_jbp",
+          "mode": "list",
+          "cachedResultName": "q3_2026_jbp"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        -1472,
+        -736
+      ],
+      "id": "17eb87b1-0e92-58c2-89df-fcb3f7ec1d74",
+      "name": "Truncate",
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    qf.*,\n  to_char(qf.budget, 'FM999,999,990.00') AS budget_formatted,\n    to_char(qf.budget_left, 'FM999,999,990.00') AS budget_left_formatted,\n    to_char(qf.budget_left + qj.\"USD_allocated\", 'FM999,999,990.00') AS total_budget_amount\nFROM q_budget.q3_2026_final qf\nJOIN q_budget.q3_2026_jbp qj\n    ON qf.\"allocation_rule\" = qj.allocation\n    AND qf.\"allocation_keys\" = qj.\"allocation#1\"\n    AND qf.\"type_of_income_expense\" = qj.account\nWHERE qj.sd = '{{ $('Jira Trigger').first().json.issue.key }}';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2640,
+        -800
+      ],
+      "id": "50f6e778-1549-5b3f-ad88-061673bb9835",
+      "name": "Select calculated Budget",
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b6fbREDACTED4REDACTEDe-ac7b-40fd-99be-05REDACTEDeREDACTEDacdb090",
+              "leftValue": "={{ $json.budget }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2912,
+        -800
+      ],
+      "id": "a46bb167-d83b-5a12-ac17-7987924d4fb8",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE q_budget.opercost_jbp AS fd\nSET amount_in_usd = fd.total_amount * fx.fx_to_usd\nFROM project_result.fx AS fx\nWHERE fd.currency = fx.currency\n  AND DATE_TRUNC('month', fd.end_date) = DATE_TRUNC('month', fx.reporting_month);\n  \n update  q_budget.opercost_jbp \n set amount_in_usd = round(amount_in_usd, 0) ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1728,
+        -400
+      ],
+      "id": "97442a80-9f59-5224-a8c4-fd0b053785fd",
+      "name": "Move amount to usd",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE q_budget.budget_opercost bo\nSET \n  budget_left = bo.amount_in_usd - agg.total_jbp_usd,\n  budget_spent = agg.total_jbp_usd\nFROM (\n  SELECT \n    entity,\n    beneficiary,\n    start_date,\n    end_date,\n    SUM(amount_in_usd) AS total_jbp_usd\n  FROM q_budget.opercost_jbp\n  GROUP BY entity, beneficiary, start_date, end_date\n) agg\nWHERE TRIM(bo.entity) = TRIM(agg.entity)\n  AND TRIM(bo.beneficiary) = TRIM(agg.beneficiary)\n  AND agg.start_date = bo.start_date\n  AND agg.end_date = bo.end_date;\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1952,
+        -400
+      ],
+      "id": "8bea6dfb-e037-5717-8764-637d77c6c513",
+      "name": "Calculate left budget",
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  bo.*,\n  TO_CHAR(bo.start_date, 'MM/DD/YYYY') AS bo_start_date_formatted,\n  TO_CHAR(bo.end_date, 'MM/DD/YYYY') AS bo_end_date_formatted,\n  TO_CHAR(bo.amount_in_usd, 'FM999,999,990.00') AS budget_formatted,\n  TO_CHAR(bo.budget_left, 'FM999,999,990.00') AS budget_left_formatted,\n  TO_CHAR(bjp.amount_in_usd + bo.budget_left, 'FM999,999,990.00') AS total_budget_amount\nFROM \n  q_budget.budget_opercost bo\nJOIN \n  q_budget.opercost_jbp bjp \n  ON TRIM(bo.entity) = TRIM(bjp.entity)\n  AND TRIM(bo.beneficiary) = TRIM(bjp.beneficiary)\n  AND bjp.start_date >= bo.start_date\n  AND bjp.end_date <= bo.end_date\nWHERE \n  bjp.sd = '{{ $('Jira Trigger').item.json.issue.key }}';\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2384,
+        -400
+      ],
+      "id": "a0a11635-02c1-51b1-a6fc-69127047b7cf",
+      "name": "Select calculated Budget1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "issueComment",
+        "issueKey": "={{ $('Jira Trigger').item.json.issue.key }}",
+        "jsonParameters": true,
+        "commentJson": "={\n  \"version\": 1,\n  \"type\": \"doc\",\n  \"content\": [\n    {\n      \"type\": \"paragraph\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"Left budget after this JIRA request:\"\n        },\n        {\n          \"type\": \"text\",\n          \"text\": \" {{ $json.budget_left_formatted }} USD\",\n          \"marks\": [\n            {\n              \"type\": \"strong\"\n            }\n          ]\n        },\n        {\n          \"type\": \"hardBreak\"\n        },\n        {\n          \"type\": \"text\",\n          \"text\": \"Left budget before this JIRA request: {{ $json.total_budget_amount }} USD\"\n        },\n        {\n          \"type\": \"hardBreak\"\n        },\n        {\n          \"type\": \"text\",\n          \"text\": \"Initial budget for the period from {{ $json.bo_start_date_formatted }} to {{ $json.bo_end_date_formatted }}: {{ $json.budget_formatted}} USD\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        2944,
+        -560
+      ],
+      "id": "a0e8e6d6-3741-5bb2-bcbe-7d5e72427b9e",
+      "name": "Jira Software4",
+      "executeOnce": true,
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4REDACTED6baREDACTED65-0ba0-4b1REDACTED-REDACTED702-de9a96REDACTED7REDACTED9b9",
+              "leftValue": "={{ $json.budget_left }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2624,
+        -416
+      ],
+      "id": "2b983526-a093-531d-b90f-62012a5f5e2c",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdREDACTEDd75REDACTEDb-b7dREDACTED-412REDACTED-93d3-2REDACTEDc65REDACTEDec7REDACTED51",
+              "leftValue": "={{ $json.operover }}",
+              "rightValue": "Opercost",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "d07fd4f6-f5a6-46d5-b34e-5eREDACTED0fREDACTED3ee45a",
+              "leftValue": "={{ $('Read data from attached forms').item.json.state.answers['53'].date }}",
+              "rightValue": "2024-12-31T00:00:00",
+              "operator": {
+                "type": "dateTime",
+                "operation": "after"
+              }
+            },
+            {
+              "id": "REDACTED_UUID",
+              "leftValue": "={{ $json.account }}",
+              "rightValue": "Cost of external subcontractors",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "a0d01af2-REDACTEDcab-4502-902REDACTED-cREDACTEDa07145cecd",
+              "leftValue": "={{ $json.account }}",
+              "rightValue": "Salaries expenses",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        -384
+      ],
+      "id": "fd9ee0b4-bcd5-5d4f-b318-53bfeba2f1d8",
+      "name": "If Opercost"
+    },
+    {
+      "parameters": {
+        "resource": "issueComment",
+        "issueKey": "={{ $('Jira Trigger').item.json.issue.key }}",
+        "comment": "=No budget for this expense!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        2928,
+        -288
+      ],
+      "id": "dbee8a5e-3b95-599e-ad12-0404dfd80cf0",
+      "name": "Jira Software3",
+      "executeOnce": true,
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "select * from q_budget.opercost_jbp oj \nwhere sd = '{{ $('Jira Trigger').item.json.issue.key }}';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2160,
+        -400
+      ],
+      "id": "0a058ea3-0219-5ad4-8cd4-0b60c8b2956f",
+      "name": "check For existance",
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2ae95529-REDACTEDfda-443a-9bfa-9e0fb7cc6a51",
+              "leftValue": "={{ $json.match }}",
+              "rightValue": "empty",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1136,
+        -400
+      ],
+      "id": "da58870d-2b01-5656-8194-f660ee1e11c0",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "function similarity(s1, s2) {\n  let longer = s1.length > s2.length ? s1 : s2;\n  let shorter = s1.length > s2.length ? s2 : s1;\n  \n  if (longer.length === 0) return 1.0;\n  \n  return (longer.length - editDistance(longer, shorter)) / parseFloat(longer.length);\n}\n\nfunction editDistance(s1, s2) {\n  s1 = s1.toLowerCase();\n  s2 = s2.toLowerCase();\n  \n  let costs = [];\n  \n  for (let i = 0; i <= s1.length; i++) {\n    let lastValue = i;\n    for (let j = 0; j <= s2.length; j++) {\n      if (i === 0) {\n        costs[j] = j;\n      } else if (j > 0) {\n        let newValue = costs[j - 1];\n        if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {\n          newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;\n        }\n        costs[j - 1] = lastValue;\n        lastValue = newValue;\n      }\n    }\n    if (i > 0) costs[s2.length] = lastValue;\n  }\n  return costs[s2.length];\n}\n\nconst beneficiaries = [\n  \"Vendor A\",\n  \"Vendor B BEOGRAD\",\n  \"Vendor C & PAYROLL Sp. z o.o.\",\n  \"Vendor D\",\n  \"LUX MED Sp. z o.o.\",\n  \"Vendor E\",\n  \"Vendor F\",\n  \"Vendor G\",\n  \"Employee D\",\n  \"Vendor H Group, LLC\",\n  \"Vendor I\",\n  \"Vendor J\",\n  \"Vendor K Gmbh (Wiesbaden)\",\n  \"Vendor L\",\n  \"Vendor M\",\n  \"Vendor N Kamil Soczówka\",\n  \"Vendor F\",\n  \"Vendor O\",\n  \"Vendor P No.1 doo Beograd\",\n  \"DRUŠTVO ZA USLUGE U OBLASTI ZAŠTITE Vendor Q BEOGRAD (ČUKARICA)\",\n  \"Društvo za reviziju i poslovno savetovanje Vendor R d.o.o. Beograd\",\n  \"Vendor S s.r.o.\"\n];\n\nconst input = $('Read data from attached forms').item.json.state.answers['16'].text;\n\nlet maxSimilarity = 0;\nlet bestMatch = '';\nlet allMatches = [];\n\nfor (const ben of beneficiaries) {\n  const sim = similarity(input, ben);\n  allMatches.push({\n    beneficiary: ben,\n    similarity: sim\n  });\n  if (sim > maxSimilarity) {\n    maxSimilarity = sim;\n    bestMatch = ben;\n  }\n}\n\nreturn {\n  input: input,\n  match: maxSimilarity >= 0.5 ? bestMatch : 'empty',\n  similarity: maxSimilarity,\n  all_matches: allMatches\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        -400
+      ],
+      "id": "c8c64e1c-767e-5646-b11d-532e831e1ecc",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DROP table if EXISTS q_budget.q3_2026_jbp_proc;\n\nCREATE TABLE q_budget.q3_2026_jbp_proc AS\nWITH SplitValues AS (\n    SELECT\n        sd,\n        total_amount,\n        account,\n        allocation,\n        TRIM(value) AS \"allocation#1\",\n        \"USD_allocated\",\n        start_date,\n        end_date,\n        currency,\n        array_length(string_to_array(\"allocation#1\", ','), 1) AS value_count\n    FROM\n        q_budget.q3_2026_jbp,\n        unnest(string_to_array(\"allocation#1\", ',')) AS value\n)\nSELECT\n    sd,\n    ROUND(total_amount / value_count, 2) AS total_amount,\n    account,\n    allocation,\n    \"allocation#1\",\n    ROUND(\"USD_allocated\" / value_count, 2) AS \"USD_allocated\",\n    start_date,\n    end_date,\n    currency\nFROM\n    SplitValues;\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2016,
+        -800
+      ],
+      "id": "54ebcd2b-a30d-5dfb-bcdf-f839d6094617",
+      "name": "Create JBP proc table",
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE q_budget.q3_2026_jbp jbp\nSET \"USD_allocated\" = CASE\n    WHEN jbp.currency = 'USD' THEN jbp.total_amount\n    WHEN jbp.currency != 'USD'\n         THEN jbp.total_amount * fx.fx_to_usd\n    ELSE jbp.\"USD_allocated\"\nEND\nFROM project_result.fx fx\nWHERE\n    jbp.currency = fx.currency\n    AND DATE_TRUNC('month', jbp.end_date) =\n        DATE_TRUNC('month', fx.reporting_month);\n\n----remove P charters  \nUPDATE q_budget.q3_2026_jbp\nSET \"allocation#1\" = REPLACE(REPLACE(\"allocation#1\", CHR(13), ''), CHR(10), '');\n\n-- First, update q1_jbp to ensure USD_allocated matches total_amount when currency is USD\nUPDATE q_budget.q3_2026_jbp\nSET \"USD_allocated\" = total_amount\nWHERE currency = 'USD';\n\n-- Update allocation to \"Practice\" for specific cases\nUPDATE q_budget.q3_2026_jbp\nSET allocation = 'Practice'\nWHERE allocation IN ('Practice', 'Practice (Pool)', 'Pool', 'Acount');",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1824,
+        -800
+      ],
+      "id": "c67e5bcd-5081-59b4-b0f6-1e7e960bb9fc",
+      "name": "Edit JBP Table",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "TRUNCATE q_budget.q3_2026_jbp;\n\n--- Inset into JBP Table  \nINSERT INTO q_budget.q3_2026_jbp (\n    sd,\n    total_amount,\n    account,\n    allocation,\n    \"allocation#1\",\n    \"USD_allocated\",\n    start_date,\n    end_date,\n    currency\n)\nSELECT\n    sd,\n    total_amount,\n    account,\n    allocation,\n    \"allocation#1\",\n    \"USD_allocated\",\n    start_date,\n    end_date,\n    currency\nFROM q_budget.q3_2026_jbp_proc;\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2192,
+        -800
+      ],
+      "id": "339f59c2-e2fa-556e-a371-ef4d25ef8b7c",
+      "name": "Insert Values into q2_jbp",
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE q_budget.q3_2026_final\nSET \n    budget_spent = aggregated_jbp.total_allocated,\n    budget_left = COALESCE(q_budget.q3_2026_final.budget,0) - aggregated_jbp.total_allocated\nFROM (\n    SELECT \n        jbp.account,\n        jbp.allocation,\n        jbp.\"allocation#1\",\n        SUM(\n            CASE \n                WHEN jbp.currency = 'USD' \n                THEN jbp.total_amount \n                ELSE jbp.\"USD_allocated\" \n            END\n        ) AS total_allocated\n    FROM q_budget.q3_2026_jbp AS jbp\n    GROUP BY jbp.account, jbp.allocation, jbp.\"allocation#1\"\n) AS aggregated_jbp\nWHERE \n    aggregated_jbp.account = q_budget.q3_2026_final.type_of_income_expense\n    AND aggregated_jbp.allocation = q_budget.q3_2026_final.allocation_rule\n    AND aggregated_jbp.\"allocation#1\" = q_budget.q3_2026_final.allocation_keys;\n\nINSERT INTO q_budget.q3_2026_final \n(type_of_income_expense, allocation_rule, allocation_keys, budget, budget_left, budget_spent)\n\nSELECT \n    aggregated_jbp.account,\n    aggregated_jbp.allocation,\n    aggregated_jbp.\"allocation#1\",\n    0 AS budget,\n    0 - COALESCE(aggregated_jbp.total_allocated,0) AS budget_left,\n    COALESCE(aggregated_jbp.total_allocated,0) AS budget_spent\n\nFROM (\n    SELECT \n        jbp.account,\n        jbp.allocation,\n        jbp.\"allocation#1\",\n        SUM(\n            CASE \n                WHEN jbp.currency = 'USD' \n                THEN jbp.total_amount \n                ELSE jbp.\"USD_allocated\" \n            END\n        ) AS total_allocated\n    FROM q_budget.q3_2026_jbp AS jbp\n    GROUP BY jbp.account, jbp.allocation, jbp.\"allocation#1\"\n) AS aggregated_jbp\n\nWHERE NOT EXISTS (\n    SELECT 1 \n    FROM q_budget.q3_2026_final f\n    WHERE aggregated_jbp.account = f.type_of_income_expense \n      AND aggregated_jbp.allocation = f.allocation_rule \n      AND aggregated_jbp.\"allocation#1\" = f.allocation_keys\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2432,
+        -800
+      ],
+      "id": "36c86631-35e7-5261-bbcb-0c93b48428af",
+      "name": "Calculate Left budget",
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -2240,
+        -1248
+      ],
+      "id": "5dea508a-c7a9-573c-bfae-a945a75ba21a",
+      "name": "Jira Software6",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "REDACTED36af02d-9d46-4REDACTEDa5-b6ec-65e575b6c17e",
+              "leftValue": "={{ $json.fields.labels }}",
+              "rightValue": "Salary",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2336,
+        -720
+      ],
+      "id": "7aaa9e4f-455d-51d9-a2a2-02df39666a6a",
+      "name": "IF Sallary1"
+    },
+    {
+      "parameters": {
+        "resource": "issueComment",
+        "issueKey": "={{ $('Jira Trigger').first().json.issue.key }}",
+        "comment": "=Left budget for 2026 Q3 after this JIRA request: {{ $json.budget_left_formatted }} USD \nLeft budget before this JIRA request: {{ $json.total_budget_amount }} USD \nInitial budget was not planned!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        3792,
+        -960
+      ],
+      "id": "56b65bd2-d727-522a-a56e-af2c7555e729",
+      "name": "Add a comment",
+      "executeOnce": true,
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "issueComment",
+        "issueKey": "={{ $('Jira Trigger').first().json.issue.key }}",
+        "jsonParameters": true,
+        "commentJson": "={\n  \"version\": 1,\n  \"type\": \"doc\",\n  \"content\": [\n    {\n      \"type\": \"paragraph\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"Left budget for 2026 Q3 after this JIRA request: \"\n        },\n        {\n          \"type\": \"text\",\n          \"text\": \"{{ $json.budget_left_formatted }} USD  \",\n          \"marks\": [\n            {\n              \"type\": \"strong\"\n            }\n          ]\n        },\n        {\n          \"type\": \"hardBreak\"\n        },\n        {\n          \"type\": \"text\",\n          \"text\": \"Left budget before this JIRA request: {{ $json.total_budget_amount }} USD  \"\n        },\n        {\n          \"type\": \"hardBreak\"\n        },\n        {\n          \"type\": \"text\",\n          \"text\": \"Initial budget: {{ $json.budget_formatted }} USD\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        3792,
+        -720
+      ],
+      "id": "4b1e8176-ab18-5ecd-b8ab-bcebe2bea22d",
+      "name": "Add a comment1",
+      "executeOnce": true,
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "issueKey": "={{$('Jira Trigger').item.json.issue.key}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -2560,
+        -720
+      ],
+      "id": "ac963cbb-8013-5897-8788-8b79cd69aee3",
+      "name": "Get an issue",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ffe7d76REDACTED-acdb-4dae-9165-125cef3d0196",
+              "leftValue": "={{ $json.allo }}",
+              "rightValue": "Intercompany",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        -768
+      ],
+      "id": "3918b6cd-64a1-5c0a-8aa0-8c3ba84215c9",
+      "name": "If Intercompany"
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "value": "q_budget",
+          "mode": "list",
+          "cachedResultName": "q_budget"
+        },
+        "table": {
+          "__rl": true,
+          "value": "opercost_jbp",
+          "mode": "list",
+          "cachedResultName": "opercost_jbp"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        3152,
+        -560
+      ],
+      "id": "5922a402-cca4-58ee-8aa8-ed4909795af0",
+      "name": "Truncate1",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "value": "q_budget",
+          "mode": "list",
+          "cachedResultName": "q_budget"
+        },
+        "table": {
+          "__rl": true,
+          "value": "opercost_jbp",
+          "mode": "list",
+          "cachedResultName": "opercost_jbp"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        3168,
+        -272
+      ],
+      "id": "237a9850-fa63-5f8b-b881-31f1a4f8ec50",
+      "name": "Truncate2",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * Code node expecting TWO inputs:\n *  - Input 1: main items (loop path)\n *  - Input 2: items from \"Read data from attached forms\"\n * Keeps all original fields from Input 1 and adds derived fields.\n */\n\n// ---- helpers ----\nconst formCache = new WeakMap();\n\n/**\n * Build and cache a Map { choiceId -> label } for (form, questionIndex)\n */\nfunction getChoiceLabel(form, qIndex) {\n  if (!form) return \"\";\n\n  let perForm = formCache.get(form);\n  if (!perForm) {\n    perForm = {};\n    formCache.set(form, perForm);\n  }\n\n  if (!perForm[qIndex]) {\n    const choices = form?.design?.questions?.[qIndex]?.choices || [];\n    perForm[qIndex] = new Map(choices.map(c => [c.id, c.label]));\n  }\n\n  const answerId = form?.state?.answers?.[qIndex]?.choices?.[0];\n  if (!answerId) return \"\";\n  return perForm[qIndex].get(answerId) || \"\";\n}\n\n// ---- inputs ----\nconst mainItems = $input.all(0);                 // from main branch\nconst formItems = $input.all(1);                 // from \"Read data from attached forms\"\nconst len = mainItems.length;\n\n// Defensive: ensure same length; if not, pair as many as possible\nconst outLen = Math.min(len, formItems.length || len);\n\n// ---- build output ----\nconst out = [];\nfor (let i = 0; i < outLen; i++) {\n  const main = mainItems[i]?.json || {};\n  const selfForm = main;                         // for \"account\" field (comes from self)\n  const attachedForm = formItems[i]?.json || {}; // other fields come from attached form\n\n  const result = {\n    ...main, // keep ALL original fields\n    account:   getChoiceLabel(selfForm, 4REDACTED),\n\n    ptype:     getChoiceLabel(attachedForm, 51),\n    curr:      getChoiceLabel(attachedForm, 29),\n    payer:     getChoiceLabel(attachedForm, 14),\n    allo:      getChoiceLabel(attachedForm, 23),\n    alempl:    getChoiceLabel(attachedForm, 25),\n    all_ent1:  getChoiceLabel(attachedForm, 31),\n    all_pro:   getChoiceLabel(attachedForm, 32),\n    prac_pool: getChoiceLabel(attachedForm, 71),\n    all_pra:   getChoiceLabel(attachedForm, 33),\n    paid_s:    getChoiceLabel(attachedForm, 52),\n    operover:  getChoiceLabel(attachedForm, 46),\n    budget:    getChoiceLabel(attachedForm, 47),\n  };\n\n  out.push({ json: result });\n}\n\n// If Input 2 had fewer items, pass through remaining main items unchanged\nfor (let i = outLen; i < len; i++) {\n  out.push({ json: { ...mainItems[i].json } });\n}\n\nreturn out;\n"
+      },
+      "id": "aa42d72a-d757-5cdc-badb-f575617e194b",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        -752
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.atlassian.com/jira/forms/cloud/your-instance-id/issue/{{ $('Get an issue').item.json.key }}/form/{{ $json.id }} ",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "jiraSoftwareCloudApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-ExperimentalApi",
+              "value": "opt-in"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 300,
+              "batchInterval": 30000
+            }
+          }
+        }
+      },
+      "id": "02234d03-6995-5fad-9752-be71bd35ce83",
+      "name": "Read data from attached forms",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -864,
+        -736
+      ],
+      "executeOnce": false,
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.atlassian.com/jira/forms/cloud/your-instance-id/issue/{{ $('Get an issue').item.json.key }}/form ",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "jiraSoftwareCloudApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-ExperimentalApi",
+              "value": "opt-in"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 300,
+              "batchInterval": 30000
+            }
+          }
+        }
+      },
+      "id": "dc2b2ba8-7e15-52dc-ae6e-ba648d58f79c",
+      "name": "List attached form",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1168,
+        -736
+      ],
+      "executeOnce": false,
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira nREDACTEDn APi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "python3 bp_import.py",
+        "cwd": "/home/user/export-script"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        896,
+        -800
+      ],
+      "id": "87bf93f9-dce3-528a-a72b-3ceedfb379a2",
+      "name": "Execute a command",
+      "credentials": {
+        "sshPassword": {
+          "id": "REDACTED",
+          "name": "SSH Remote Server"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO q_budget.q3_2026_jbp (\n    account,\n    allocation,\n    \"allocation#1\",\n    currency,\n    end_date,\n    sd,\n    start_date,\n    total_amount,\n    \"USD_allocated\"\n)\nSELECT\n    bp.\"Management account\",\n    bp.\"Allocation\",\n\n    COALESCE(\n        NULLIF(bp.\"Allocation Employee\", ''),\n        NULLIF(bp.\"Allocation Entity\", ''),\n        NULLIF(bp.\"Allocation Project\", ''),\n        NULLIF(bp.\"Allocation Practice\", ''),\n        NULLIF(bp.\"Allocation Account\", ''),\n        NULLIF(bp.\"Allocation Presale\", ''),\n        'NA'\n    ),\n\n    bp.\"Currency\",\n\n    NULLIF(bp.\"End date of service\", '')::date,\n    bp.\"Issue Key\",\n    NULLIF(bp.\"Start date of service\", '')::date,\n    NULLIF(bp.\"Total amount\", '')::numeric,\n    0\n\nFROM mrp.bill_payment bp\nWHERE\n    NULLIF(bp.\"Start date of service\", '') IS NOT NULL\n    AND NULLIF(bp.\"End date of service\", '') IS NOT NULL\n    AND NULLIF(bp.\"Start date of service\", '')::date <= DATE '2026-09-30'\n    AND NULLIF(bp.\"End date of service\", '')::date >= DATE '2026-01-01'\n    AND bp.\"Management account\" <> 'Salaries expenses'\n    AND bp.\"Opercost/overhead\" = 'Overhead'\n    AND bp.\"Allocation\" <> 'Intercompany';\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1440,
+        -800
+      ],
+      "id": "fbb27989-eb90-5b4a-9f7a-04ed9f26778c",
+      "name": "Insert JBP's",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f3231494-4b6d-4f27-REDACTEDb93-96REDACTED1991aed1d",
+              "leftValue": "={{ $('Jira Trigger').item.json.comment.body }}",
+              "rightValue": "Left Budget",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "id": "d75e1460-85ee-543e-84cd-83f65c782642",
+      "name": "Check Comment",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2816,
+        -720
+      ]
+    },
+    {
+      "parameters": {
+        "command": "python3 bp_import.py",
+        "cwd": "/home/user/export-script"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        -400
+      ],
+      "id": "2849141b-dbdf-5373-befd-21c7f88a2604",
+      "name": "Execute a command1",
+      "credentials": {
+        "sshPassword": {
+          "id": "REDACTED",
+          "name": "SSH Remote Server"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO q_budget.opercost_jbp (\n    sd,\n    entity,\n    beneficiary,\n    total_amount,\n    amount_in_usd,\n    start_date,\n    end_date,\n    currency\n)\nSELECT\n    bp.\"Issue Key\"                                              AS sd,\n    bp.\"Allocation Entity\"                                      AS entity,\n    bp.\"Beneficiary\"                                            AS beneficiary,\n    NULLIF(bp.\"Total amount\", '')::numeric                      AS total_amount,\n    0                                                            AS amount_in_usd,\n    NULLIF(bp.\"Start date of service\", '')::date                AS start_date,\n    NULLIF(bp.\"End date of service\", '')::date                  AS end_date,\n    bp.\"Currency\"                                               AS currency\n\nFROM mrp.bill_payment bp\nWHERE\n    NULLIF(bp.\"Start date of service\", '') IS NOT NULL\n    AND NULLIF(bp.\"End date of service\", '') IS NOT NULL\n    AND bp.\"Management account\" <> 'Salaries expenses'\n    AND bp.\"Opercost/overhead\" = 'Opercost'\n    AND bp.\"Allocation\" <> 'Intercompany';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1552,
+        -416
+      ],
+      "id": "5bbde34f-74c0-515c-920c-c165c974dc4f",
+      "name": "Insert JBP's opercost",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO q_budget.q3_2026_jbp (\n    account,\n    allocation,\n    \"allocation#1\",\n    currency,\n    end_date,\n    sd,\n    start_date,\n    total_amount,\n    \"USD_allocated\"\n)\nSELECT\n    ap.\"Account\"                                AS account,\n    ap.\"Allocation\"                             AS allocation,\n    COALESCE(NULLIF(ap.\"Allocation#1\", ''), 'NA') AS \"allocation#1\",\n    ap.\"Currency\"                               AS currency,\n    ap.\"Fact of payment\"::date                  AS end_date,\n    'Autopayments'                              AS sd,\n    ap.\"Fact of payment\"::date                  AS start_date,\n    ap.\"Amount\"                                 AS total_amount,\n    0                                           AS \"USD_allocated\"\nFROM mrp.autopayments ap\nWHERE\n    ap.\"Fact of payment\" >= DATE '2026-01-01'\n    AND ap.\"Fact of payment\" < DATE '2026-10-01'\n    AND ap.\"Opercost/ Overhead\" = 'Overhead';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1648,
+        -800
+      ],
+      "id": "951d2cc8-9b87-57e4-8f83-cb08733dac91",
+      "name": "Insert Autopayments",
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        -224
+      ],
+      "id": "01a903cc-4713-5efd-bf84-bb030dd61305",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "oHtREDACTEDPKa4OZkYa6P3",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/oHtREDACTEDPKa4OZkYa6P3",
+          "cachedResultName": "Quarter Budget Btrip DWH"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        1232,
+        -800
+      ],
+      "id": "fb41d5df-feba-5e32-afed-c982ed488117",
+      "name": "Insert Btrips",
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "content": "change dates\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3200,
+        -592
+      ],
+      "typeVersion": 1,
+      "id": "f14382f2-a2c4-5f26-9b3d-98109e0f2716",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "change dates\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1376,
+        -640
+      ],
+      "typeVersion": 1,
+      "id": "9bcb9e0e-bbf0-5654-a343-de7163b9e74f",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "change dates once a year\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        416,
+        -624
+      ],
+      "typeVersion": 1,
+      "id": "4f6e55f6-5f24-57f8-ab3c-8f3444d9ab71",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d03REDACTED7f5b-f3d7-4292-b9ae-c3b3e9f12fd5",
+              "leftValue": "={{ $json.fields.labels }}",
+              "rightValue": "API",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2032,
+        -736
+      ],
+      "id": "c8be8e7c-bbe3-5106-87e6-543856ac204e",
+      "name": "IF API"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Jira Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Overhead": {
+      "main": [
+        [
+          {
+            "node": "Execute a command",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If Opercost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Truncate": {
+      "main": [
+        [
+          {
+            "node": "List attached form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select calculated Budget": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Add a comment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add a comment1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move amount to usd": {
+      "main": [
+        [
+          {
+            "node": "Calculate left budget",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate left budget": {
+      "main": [
+        [
+          {
+            "node": "check For existance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select calculated Budget1": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Jira Software4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Jira Software3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Opercost": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check For existance": {
+      "main": [
+        [
+          {
+            "node": "Select calculated Budget1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Execute a command1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create JBP proc table": {
+      "main": [
+        [
+          {
+            "node": "Insert Values into q2_jbp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit JBP Table": {
+      "main": [
+        [
+          {
+            "node": "Create JBP proc table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Values into q2_jbp": {
+      "main": [
+        [
+          {
+            "node": "Calculate Left budget",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Left budget": {
+      "main": [
+        [
+          {
+            "node": "Select calculated Budget",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira Software6": {
+      "main": [
+        []
+      ]
+    },
+    "IF Sallary1": {
+      "main": [
+        [
+          {
+            "node": "IF API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get an issue": {
+      "main": [
+        [
+          {
+            "node": "IF Sallary1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Intercompany": {
+      "main": [
+        [
+          {
+            "node": "If Overhead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira Software4": {
+      "main": [
+        [
+          {
+            "node": "Truncate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira Software3": {
+      "main": [
+        [
+          {
+            "node": "Truncate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If Intercompany",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read data from attached forms": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List attached form": {
+      "main": [
+        [
+          {
+            "node": "Read data from attached forms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command": {
+      "main": [
+        [
+          {
+            "node": "Insert Btrips",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert JBP's": {
+      "main": [
+        [
+          {
+            "node": "Insert Autopayments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Comment": {
+      "main": [
+        [
+          {
+            "node": "Get an issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command1": {
+      "main": [
+        [
+          {
+            "node": "Insert JBP's opercost",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert JBP's opercost": {
+      "main": [
+        [
+          {
+            "node": "Move amount to usd",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Autopayments": {
+      "main": [
+        [
+          {
+            "node": "Edit JBP Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Execute a command1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Btrips": {
+      "main": [
+        [
+          {
+            "node": "Insert JBP's",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF API": {
+      "main": [
+        [
+          {
+            "node": "Truncate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "RI9tREDACTEDHHHnVM6oSsREDACTED"
+  },
+  "versionId": "REDACTED",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REDACTED_INSTANCE_ID"
+  },
+  "nodeGroups": [],
+  "id": "REDACTED",
+  "tags": [
+    {
+      "updatedAt": "2025-01-10T15:24:04.30REDACTEDZ",
+      "createdAt": "2025-01-10T15:24:04.30REDACTEDZ",
+      "id": "hd2B7HP5UiymstmO",
+      "name": "QBudget"
+    }
+  ]
+}
