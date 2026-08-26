@@ -1,0 +1,2238 @@
+{
+  "name": "PPL Instrument Access (MI)",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        560
+      ],
+      "id": "01a903cc-4713-5efd-bf84-bb030dd61305",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 2,
+              "triggerAtMinute": 14
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -16,
+        208
+      ],
+      "id": "2c3ffe72-a4b1-5e52-a026-10e378217d5c",
+      "name": "Schedule Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        208,
+        -1136
+      ],
+      "id": "1ee5b11c-76de-5876-b672-3842ba9a0863",
+      "name": "Loop Over Items",
+      "alwaysOutputData": false,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_001",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 209255972,
+          "mode": "list",
+          "cachedResultName": "Directory (Short)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_001/edit#gid=209255972"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        0,
+        -1136
+      ],
+      "id": "f72536b9-364c-5442-93aa-2d199b33b2f1",
+      "name": "Short",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_001",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1916700438,
+          "mode": "list",
+          "cachedResultName": "FlattenAR",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_001/edit#gid=191670043REDACTED"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Employee_PD",
+              "lookupValue": "={{ $('Short').item.json.Employee }}"
+            },
+            {
+              "lookupColumn": "Employee type",
+              "lookupValue": "={{ $('Short').item.json.ADDPPL }}"
+            }
+          ]
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "A:E"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        -1088
+      ],
+      "id": "7a33ff92-ec72-5ae4-a40d-4869ad9a6b17",
+      "name": "read pplaccess",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_001",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2007201809,
+          "mode": "list",
+          "cachedResultName": "ALL Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_001/edit#gid=2007201REDACTED09"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Employee": "={{ $('Short').item.json['Full Name'] }}",
+            "Access type ": "={{ $('read pplaccess').item.json['Access type '] }}",
+            "Access": "={{ $('read pplaccess').item.json.Access }}",
+            "Status": "TO DO",
+            "Valid from": "={{ $('Short').item.json['Valid from'] }}",
+            "Valid to": "={{ $('Short').item.json['Valid to'] }}"
+          },
+          "matchingColumns": [
+            "Employee"
+          ],
+          "schema": [
+            {
+              "id": "Employee",
+              "displayName": "Employee",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Access type ",
+              "displayName": "Access type ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Access",
+              "displayName": "Access",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Valid from",
+              "displayName": "Valid from",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Valid to",
+              "displayName": "Valid to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        976,
+        -1248
+      ],
+      "id": "60ad1cb7-2d65-5992-8057-39939a08e7cb",
+      "name": "Add all data",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e56d06REDACTED9-7c30-4ca4-REDACTED679-435f26e7115d",
+              "leftValue": "={{ $json.Access }}",
+              "rightValue": "No",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "f1cREDACTEDd1fe-1c4REDACTED-4176-bda1-9534fbbbec41",
+              "leftValue": "={{ $json.Access }}",
+              "rightValue": "By request",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        640,
+        -1248
+      ],
+      "id": "3d8f091d-acb2-5489-acef-489ce2a443c0",
+      "name": "Filter",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "truncate ops.ppl_access_in;\n\ntruncate ops.ppl_access_out;\n\ntruncate ops.ppl_access_matrix;\n\ntruncate ops.ppl_access_cross_data;\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        416,
+        560
+      ],
+      "id": "401dbfc4-3743-5a10-b1ec-58270383ef34",
+      "name": "Truncate data",
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "ops",
+          "mode": "list",
+          "cachedResultName": "ops"
+        },
+        "table": {
+          "__rl": true,
+          "value": "ppl_access_in",
+          "mode": "list",
+          "cachedResultName": "ppl_access_in"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "valid_from_": "={{ $json.valid_from_ }}",
+            "valid_to_": "={{ $json.valid_to_ }}",
+            "full_name_": "={{ $json.full_name_ }}",
+            "mapped_group": "={{ $json.mapped_group }}",
+            "t1aer": "={{ $json.t1aer }}",
+            "access_type": "={{ $json.access_type }}",
+            "action_": "={{ $json.action_ }}",
+            "status_": "={{ $json.status_ }}",
+            "access_": "={{ $json.access_ }}",
+            "executor_": "={{ $json.executor_ }}",
+            "jira_link": "={{ $json.jira_link }}",
+            "comment_": "={{ $json.comment_ }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "valid_from_",
+              "displayName": "valid_from_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "valid_to_",
+              "displayName": "valid_to_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "full_name_",
+              "displayName": "full_name_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mapped_group",
+              "displayName": "mapped_group",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "t1aer",
+              "displayName": "t1aer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "access_type",
+              "displayName": "access_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "action_",
+              "displayName": "action_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_",
+              "displayName": "status_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "access_",
+              "displayName": "access_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "executor_",
+              "displayName": "executor_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "jira_link",
+              "displayName": "jira_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "comment_",
+              "displayName": "comment_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        880,
+        560
+      ],
+      "id": "03e5fd0d-e571-583f-b785-f1bd3cb26007",
+      "name": "Add data to ops.ppl_access",
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "ops",
+          "mode": "list",
+          "cachedResultName": "ops"
+        },
+        "table": {
+          "__rl": true,
+          "value": "ppl_access_matrix",
+          "mode": "list",
+          "cachedResultName": "ppl_access_matrix"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "mapped_group": "={{ $json['Employee type'] }}",
+            "t1aer": "={{ $json.Employee_PD }}",
+            "access_type": "={{ $json['Access type'] }}",
+            "access": "={{ $json.Access }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "access_type",
+              "displayName": "access_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mapped_group",
+              "displayName": "mapped_group",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "t1aer",
+              "displayName": "t1aer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "access",
+              "displayName": "access",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2304,
+        912
+      ],
+      "id": "74b5e100-444b-5697-bca8-23f35c8ed4f9",
+      "name": "Add data to ops.ppl_access1",
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "--PPL instruments - get trigger from PD\ndrop table if exists ops.ppl_access_cross_data;\n--\ncreate table if not exists ops.ppl_access_cross_data as (\nwith input_pd as \n\t\t(WITH emp_map(raw_type, t1aer, mapped_group) AS (\n\t\t\t\t    VALUES\n\t\t\t\t        ('Employee',                'Yes', 'Employees/Employees(EOR)/Contractors/Maternity&Unpaid Leave'),\n\t\t\t\t        ('Employee',                'No',  'Employees/Employees(EOR)/Contractors/Maternity&Unpaid Leave'),\n\t\t\t\t        ('Contractor',              'Yes', 'Employees/Employees(EOR)/Contractors/Maternity&Unpaid Leave'),\n\t\t\t\t        ('Contractor',              'No',  'Contractors'),\n\t\t\t\t        ('Lended resource',         'Yes', 'Lended Resources'),\n\t\t\t\t        ('Lended resource',         'No',  'Lended Resources'),\n\t\t\t\t        ('Account only',            'Yes', 'Account only'),\n\t\t\t\t        ('Account only',            'No',  'Account only'),\n\t\t\t\t        ('Offboarded',              'Yes', 'Offboarded'),\n\t\t\t\t        ('Offboarded',              'No',  'Offboarded'),\n\t\t\t\t        ('Maternity/ Unpaid Leave', 'Yes', 'Employees/Employees(EOR)/Contractors/Maternity&Unpaid Leave'),\n\t\t\t\t        ('Maternity/ Unpaid Leave', 'No',  'Employees/Employees(EOR)/Contractors/Maternity&Unpaid Leave'),\n\t\t\t\t        ('Outstaff',                'Yes', 'Outstaff'),\n\t\t\t\t        ('Outstaff',                'No',  'Outstaff'),\n\t\t\t\t        ('EOR',                     'Yes', 'Employees/Employees(EOR)/Contractors/Maternity&Unpaid Leave'),\n\t\t\t\t        ('EOR',                     'No',  'EOR by ACME')\n\t\t\t\t),\n\t\t\t\tmapped AS (\n\t\t\t\t    SELECT\n\t\t\t\t        pd.id,\n\t\t\t\t        pd.full_name,\n\t\t\t\t        pd.t1aer,\n\t\t\t\t        COALESCE(em.mapped_group, pd.type_) AS mapped_group,\n\t\t\t\t        daterange(pd.valid_from, pd.valid_to, '[]') AS valid_period\n\t\t\t\t    FROM ops.pd AS pd\n\t\t\t\t    LEFT JOIN emp_map AS em\n\t\t\t\t        ON em.raw_type = pd.type_\n\t\t\t\t       AND em.t1aer    = pd.t1aer\n\t\t\t\t    WHERE pd.valid_from <= pd.valid_to\n\t\t\t\t),\n\t\t\t\taggregated AS (\n\t\t\t\t    SELECT\n\t\t\t\t        id,\n\t\t\t\t        full_name,\n\t\t\t\t        mapped_group,\n\t\t\t\t        t1aer,\n\t\t\t\t        range_agg(valid_period) AS valid_periods\n\t\t\t\t    FROM mapped\n\t\t\t\t    GROUP BY\n\t\t\t\t        id,\n\t\t\t\t        full_name,\n\t\t\t\t        mapped_group,\n\t\t\t\t        t1aer\n\t\t\t\t)\n\t\t\t\tSELECT\n\t\t\t\t    lower(period)     AS valid_from_,\n\t\t\t\t    upper(period) - 1 AS valid_to_,\n\t\t\t\t    id,\n\t\t\t\t    full_name         AS full_name_,\n\t\t\t\t    mapped_group,\n\t\t\t\t    t1aer\n\t\t\t\tFROM aggregated\n\t\t\t\tCROSS JOIN LATERAL unnest(valid_periods) AS periods(period)\n\t\t\t\tORDER BY\n\t\t\t\t    id,\n\t\t\t\t    full_name,\n\t\t\t\t    lower(period))\nselect \n\tipd.valid_from_,\n\tipd.valid_to_,\n\tipd.id,\n\tipd.full_name_,\n\tipd.mapped_group,\n\tipd.t1aer,\n\tm.access_type,\n\tm.\"access\" as access_,\n\tcase when m.\"access\" in ('No') then 'Revoke'\n\t\twhen m.\"access\" in ('Default', 'Default ', 'Yes') then 'Grant'\n\t\twhen m.\"access\" in ('By request') then 'Request'\n\t\twhen ipd.mapped_group in ('Offboarded') then 'Revoke all'\n\t\telse 'Error' end as action_\nfrom input_pd as ipd\nleft join ops.ppl_access_matrix as m\n\ton ipd.mapped_group = m.mapped_group\n\tand ipd.t1aer = m.t1aer\nwhere m.\"access\" in ('No', 'Default', 'By request', 'Default ', 'Yes')\n\tor ipd.mapped_group in ('Offboarded')\norder by \n\tipd.id,\n\tipd.valid_from_);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1648,
+        1120
+      ],
+      "id": "8c8fe114-fdfe-519e-b4cd-ae1044f8cfe0",
+      "name": "Create ops.ppl_access_cross_data",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "--Кейс когда новый сотрудник\ninsert into ops.ppl_access_out\nSELECT\n\tvalid_from_,\n\tvalid_to_,\n\tid,\n\tfull_name_,\n\tmapped_group,\n\tt1aer,\n\taccess_type,\n\taction_,\n\t'To do' as status_,\n  access_,\n  'api_bot' as executor_\nFROM ops.ppl_access_cross_data c\nWHERE \n\t\tNOT EXISTS (\n\t    SELECT 1\n\t    FROM ops.ppl_access_in i\n\t    WHERE i.id = c.id\n\t\t)\n\tand action_ in ('Grant');",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2352,
+        1120
+      ],
+      "id": "98aea64c-d4f0-5f4e-acd9-c5ad5483c1cc",
+      "name": "Case New person",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "--Выгрузка данных в гугл шит из ops.ppl_access_out\nselect \n\tto_char(valid_from_, 'YYYY-MM-DD') as valid_from_,\n\tto_char(valid_to_, 'YYYY-MM-DD') as valid_to_,\n\tid,\n\tfull_name_,\n\tmapped_group,\n\tt1aer,\n\taccess_type,\n\taction_,\n\tstatus_,\n  access_,\n  executor_,\n  jira_link,\n  comment_\nfrom ops.ppl_access_out\norder by \n\tvalid_from_,\n\tfull_name_ ;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        3456,
+        1264
+      ],
+      "id": "5d89038f-192d-5672-908a-88e5659e2c12",
+      "name": "Get data from dwh",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "--Кейс когда нет изменений\ninsert into ops.ppl_access_out\nselect\n\tbase_in.valid_from_,\n\tbase_in.valid_to_,\n\tbase_in.id,\n\tbase_in.full_name_,\n\tbase_in.mapped_group,\n\tbase_in.t1aer,\n\tbase_in.access_type,\n\tbase_in.action_,\n\tbase_in.status_,\n  base_in.access_,\n  base_in.executor_,\n  base_in.jira_link,\n  base_in.comment_\nfrom ops.ppl_access_in as base_in\nleft join ops.ppl_access_cross_data as base_out\n\ton base_in.valid_from_ = base_out.valid_from_\n\tand base_in.valid_to_ = base_out.valid_to_\n\tand base_in.id = base_out.id\n\tand base_in.mapped_group = base_out.mapped_group\n\tand base_in.t1aer = base_out.t1aer\n\tand base_in.access_type = base_out.access_type\n\t--and base_out.access_ in ('Default', 'By request', 'Default ')\n\tand base_in.action_ = base_out.action_\nwhere base_out.valid_from_ is not null;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2352,
+        1328
+      ],
+      "id": "8cd9d9ca-a884-5965-a716-943f42b93457",
+      "name": "Case No change",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "--Кейс когда есть изменения (оверка на то что нужно предоставить)\ninsert into ops.ppl_access_out\nselect\n\tbase_out.valid_from_,\n\tbase_out.valid_to_,\n\tbase_out.id,\n\tbase_out.full_name_,\n\tbase_out.mapped_group,\n\tbase_out.t1aer,\n\tbase_out.access_type,\n\tbase_out.action_,\n\t'To do' as status_,\n\t--base_out.*,\n  base_out.access_,\n  'api_bot' as executor_\nfrom ops.ppl_access_in as base_in\nright join ops.ppl_access_cross_data as base_out\n\ton base_in.valid_from_ = base_out.valid_from_\n\tand base_in.valid_to_ = base_out.valid_to_\n\tand base_in.id = base_out.id\n\tand base_in.mapped_group = base_out.mapped_group\n\tand base_in.t1aer = base_out.t1aer\n\tand base_in.access_type = base_out.access_type\n\t--and base_out.access_ in ('Default', 'By request', 'Default ')\n\t--and base_out.action_ = 'Grant'\nwhere base_in.valid_from_ is null\n\tand base_out.action_ = 'Grant'\n\t--and base_out.id = '173'\n\t;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2352,
+        1536
+      ],
+      "id": "b82532f7-1a51-545e-852e-adf98540591d",
+      "name": "Case Add Grant access",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "\n--Кейс когда нужно убрать или наоборот предоставить доступ (либо матрица изменилась либо удалили строку почему-то)\ninsert into ops.ppl_access_out\nselect\n\tbase_in.valid_from_,\n\tbase_in.valid_to_,\n\tbase_in.id,\n\tbase_in.full_name_,\n\tbase_in.mapped_group,\n\tbase_in.t1aer,\n\tbase_in.access_type,\n\tbase_out.action_,\n\t'To do' as status_,\n  base_out.access_,\n  'api_bot' as executor_\nfrom ops.ppl_access_in as base_in\nleft join ops.ppl_access_cross_data as base_out\n\ton base_in.valid_from_ = base_out.valid_from_\n\tand base_in.valid_to_ = base_out.valid_to_\n\tand base_in.id = base_out.id\n\tand base_in.mapped_group = base_out.mapped_group\n\tand base_in.t1aer = base_out.t1aer\n\tand base_in.access_type = base_out.access_type\n\t--and base_out.access_ in ('Default', 'By request', 'Default ')\n\tand base_in.action_ <> base_out.action_\nwhere base_out.valid_from_ is not null;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2352,
+        1744
+      ],
+      "id": "4e508b76-777a-5f17-a335-036b2ed14f47",
+      "name": "Case Grant or Revoke update required",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "--Кейс с увольнением, ставим на revoke все выданные ранее доступы\ninsert into ops.ppl_access_out\nselect distinct\n\tc.valid_from_,\n\tc.valid_to_,\n\tc.id,\n\tc.full_name_,\n\tc.mapped_group,\n\tc.t1aer,\n\tbase_in.access_type,\n\tc.action_,\n\t'To do' as status_,\n  c.access_,\n  'api_bot' as executor_\nfrom ops.ppl_access_cross_data as c\nleft join ops.ppl_access_in as base_in\n\ton base_in.valid_from_ < c.valid_from_\n\t--and base_in.valid_to_ = base_out.valid_to_\n\tand base_in.id = c.id\n\t--and base_in.mapped_group = base_out.mapped_group\n\t--and base_in.t1aer = base_out.t1aer\n\t--and base_in.access_type = base_out.access_type\n\t--and base_out.access_ in ('Default', 'By request', 'Default ')\n\t--and base_in.action_ = base_out.action_\t\nWHERE \n\t\tNOT EXISTS (\n\t    SELECT 1\n\t    FROM ops.ppl_access_in i\n\t    WHERE i.id = c.id\n\t    \tand i.valid_from_ = c.valid_from_\n\t    \tand i.valid_to_ = c.valid_to_\n\t    \tand i.mapped_group = c.mapped_group\n\t    \tand i.t1aer = c.t1aer\n\t\t)\n\tand c.mapped_group in ('Offboarded')\n\tand base_in.action_ not in ('Revoke');",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2352,
+        1984
+      ],
+      "id": "e0c670d1-6a3d-5f26-ab38-89208b127359",
+      "name": "Add new Offboarded",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "--Кейс по ранее уволенным - сохраняю все записи что были раньше\ninsert into ops.ppl_access_out\nselect * from ops.ppl_access_in pai \nwhere mapped_group in ('Offboarded');",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2352,
+        2176
+      ],
+      "id": "3b2d50d8-c7c9-527c-a24b-2cb85ca25e27",
+      "name": "Add old Offboarded",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "REDACTED_SUB_WORKFLOW",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/REDACTED_SUB_WORKFLOW",
+          "cachedResultName": "People directory to DWH"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        560
+      ],
+      "id": "08f4b33f-7261-5a15-a859-26f7626dafb3",
+      "name": "Call 'People directory to DWH'",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Получаем входящие данные от предыдущего узла\nconst items = $input.all();\nconst output = [];\n\n// Список колонок, которые НЕ нужно разворачивать (метаданные)\nconst excludeKeys = [\n  \"row_number\",\n  \"from instruments sheet *Instrument Vender\",\n  \"*Access type \",\n  \"*\",\n  \"IT Admin comment for onboarding *\",\n  \"IT Admin comment for offboarding *\"\n];\n\nfor (const item of items) {\n  const row = item.json;\n  const accessType = (row[\"*Access type \"] || \"\").trim();\n  \n  if (!accessType) continue;\n\n  // Проходим по всем свойствам объекта (строки таблицы)\n  for (const key in row) {\n    // Пропускаем мета-колонки и ищем только те, что содержат разделитель '*'\n    if (!excludeKeys.includes(key) && key.includes('*')) {\n      const parts = key.split('*');\n      const t1aer = parts[0].trim(); // Например, \"Employees\" или \"Non-Employees\"\n      const employeeType = parts[1].trim(); // Например, \"Contractors\"\n      \n      // Значение доступа (например, \"Default\", \"No\", \"By request\")\n      let accessVal = (row[key] || \"\").trim();\n      \n      // Вычисляем Employee_PD (Yes для Employees, No для Non-Employees)\n      const t1aerPd = (t1aer === \"Employees\") ? \"Yes\" : \"No\";\n\n      output.push({\n        json: {\n          \"Access type\": accessType,\n          \"Employee type\": employeeType,\n          \"Employee\": t1aer,\n          \"Access\": accessVal,\n          \"Employee_PD\": t1aerPd\n        }\n      });\n    }\n  }\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2080,
+        912
+      ],
+      "id": "2be9f76b-ac3c-5578-9944-00cefdbd51c6",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_002",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 293909348,
+          "mode": "list",
+          "cachedResultName": "Access Rules",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_002/edit#gid=29390934REDACTED"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRange",
+              "headerRow": 3,
+              "firstDataRow": 4
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1872,
+        912
+      ],
+      "id": "1a7d3369-04a2-5f0e-afaf-66a899877d8d",
+      "name": "Read people access rules matrix from PD",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_001",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1916700438,
+          "mode": "list",
+          "cachedResultName": "FlattenAR",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_001/edit#gid=191670043REDACTED"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1648,
+        912
+      ],
+      "id": "f2c02599-9fc7-5489-af5a-c065a8054ffb",
+      "name": "Read people access rules matrix test",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH processed_rows AS (\n  SELECT \n    to_char(valid_from_, 'YYYY-MM-DD') as valid_from_,\n    to_char(valid_to_, 'YYYY-MM-DD') as valid_to_,\n    id,\n    full_name_,\n    mapped_group,\n    t1aer,\n    access_type,\n    action_,\n    -- Проверяем статус текущей (нижней) и предыдущей (верхней) строки\n    CASE \n      WHEN status_ = 'To do' AND LAG(status_) OVER (\n        PARTITION BY id, access_type, action_ \n        ORDER BY valid_from_ NULLS FIRST\n      ) = 'Done' THEN 'Done'\n      ELSE status_\n    END as status_,\n    access_,\n    executor_,\n    jira_link,\n    comment_\n  FROM ops.ppl_access_out\n)\n-- Выводим только уникальные строки\nSELECT DISTINCT\n  valid_from_,\n  valid_to_,\n  id,\n  full_name_,\n  mapped_group,\n  t1aer,\n  access_type,\n  action_,\n  status_,\n  access_,\n  executor_,\n  jira_link,\n  comment_\nFROM processed_rows\nORDER BY \n  valid_from_,\n  full_name_;\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        3456,
+        1488
+      ],
+      "id": "25408881-36b7-5de8-bf9b-1aaf99dd7075",
+      "name": "Get data from dwh1",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_001",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 714010277,
+          "mode": "list",
+          "cachedResultName": "DONE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_001/edit#gid=714010277"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "valid_from_",
+              "displayName": "valid_from_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "valid_to_",
+              "displayName": "valid_to_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "full_name_",
+              "displayName": "full_name_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mapped_group",
+              "displayName": "mapped_group",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "t1aer",
+              "displayName": "t1aer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "access_type ",
+              "displayName": "access_type ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "action_",
+              "displayName": "action_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_",
+              "displayName": "status_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4032,
+        1664
+      ],
+      "id": "e696d6d9-645f-5b07-8e2d-aa269d3c7c6d",
+      "name": "Add data to DONE",
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_001",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 864868402,
+          "mode": "list",
+          "cachedResultName": "TO DO",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_001/edit#gid=REDACTED64REDACTED6REDACTED402"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "valid_from_",
+              "displayName": "valid_from_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "valid_to_",
+              "displayName": "valid_to_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "full_name_",
+              "displayName": "full_name_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mapped_group",
+              "displayName": "mapped_group",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "t1aer",
+              "displayName": "t1aer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "access_type",
+              "displayName": "access_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "access_",
+              "displayName": "access_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "executor_",
+              "displayName": "executor_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "action_",
+              "displayName": "action_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_",
+              "displayName": "status_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "jira_link",
+              "displayName": "jira_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "comment_",
+              "displayName": "comment_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4032,
+        1296
+      ],
+      "id": "305f36df-7f87-5ce9-bb0e-2c11ee812416",
+      "name": "Add data to TO DO",
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_001",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 714010277,
+          "mode": "list",
+          "cachedResultName": "DONE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_001/edit#gid=714010277"
+        },
+        "keepFirstRow": true
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3008,
+        1248
+      ],
+      "id": "a354489c-0a4e-569e-bde0-c1b226b4516d",
+      "name": "Clear DONE",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_001",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 864868402,
+          "mode": "list",
+          "cachedResultName": "TO DO",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_001/edit#gid=REDACTED64REDACTED6REDACTED402"
+        },
+        "keepFirstRow": true
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3008,
+        1488
+      ],
+      "id": "188dad43-324f-51d4-89b1-62c2e4a14fe9",
+      "name": "Clear TO DO",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "REDACTED_UUID",
+              "leftValue": "={{ $json.status_ }}",
+              "rightValue": "To do",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        3776,
+        1296
+      ],
+      "id": "6d88550f-6925-5cc4-baeb-d23b3248b33a",
+      "name": "Filter1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "REDACTED_UUID",
+              "leftValue": "={{ $json.status_ }}",
+              "rightValue": "Done",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        3776,
+        1664
+      ],
+      "id": "eb1d0bac-e816-51e8-af7c-043b20f8d0e0",
+      "name": "Filter2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_001",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 714010277,
+          "mode": "list",
+          "cachedResultName": "DONE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_001/edit#gid=714010277"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        656,
+        560
+      ],
+      "id": "f77fa360-1705-5445-afac-22412acec179",
+      "name": "Read from DONE",
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "ops",
+          "mode": "list",
+          "cachedResultName": "ops"
+        },
+        "table": {
+          "__rl": true,
+          "value": "ppl_access_in",
+          "mode": "list",
+          "cachedResultName": "ppl_access_in"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "valid_from_": "={{ $json.valid_from_ }}",
+            "valid_to_": "={{ $json.valid_to_ }}",
+            "full_name_": "={{ $json.full_name_ }}",
+            "mapped_group": "={{ $json.mapped_group }}",
+            "t1aer": "={{ $json.t1aer }}",
+            "access_type": "={{ $json.access_type }}",
+            "action_": "={{ $json.action_ }}",
+            "status_": "={{ $json.status_ }}",
+            "access_": "={{ $json.access_ }}",
+            "executor_": "={{ $json.executor_ }}",
+            "jira_link": "={{ $json.jira_link }}",
+            "comment_": "={{ $json.comment_ }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "valid_from_",
+              "displayName": "valid_from_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "valid_to_",
+              "displayName": "valid_to_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "full_name_",
+              "displayName": "full_name_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mapped_group",
+              "displayName": "mapped_group",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "t1aer",
+              "displayName": "t1aer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "access_type",
+              "displayName": "access_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "action_",
+              "displayName": "action_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_",
+              "displayName": "status_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "access_",
+              "displayName": "access_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "executor_",
+              "displayName": "executor_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "jira_link",
+              "displayName": "jira_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "comment_",
+              "displayName": "comment_",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        880,
+        784
+      ],
+      "id": "aa05c1dd-227b-5c5e-8017-59ed5f1bc6b5",
+      "name": "Add data to ops.ppl_access2",
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED",
+          "name": "PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_001",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 864868402,
+          "mode": "list",
+          "cachedResultName": "TO DO",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_001/edit#gid=REDACTED64REDACTED6REDACTED402"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        656,
+        784
+      ],
+      "id": "ccc350b0-16ed-5361-be0a-90068020f0e4",
+      "name": "Read from TO DO",
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "REDACTED_UUID",
+              "leftValue": "={{ $json.valid_to_ }}",
+              "rightValue": "2099-12-31",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        3792,
+        1952
+      ],
+      "id": "73c43ab6-67aa-50c9-af2d-c84c3d5e66d7",
+      "name": "Filter3"
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_001",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1541926116,
+          "mode": "list",
+          "cachedResultName": "SHORT",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_001/edit#gid=1541926116"
+        },
+        "keepFirstRow": true
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3008,
+        1696
+      ],
+      "id": "d41337c0-b911-5b29-83fa-2fa1c32f4504",
+      "name": "Clear TO DO1",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_001",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1541926116,
+          "mode": "list",
+          "cachedResultName": "SHORT",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_001/edit#gid=1541926116"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4048,
+        1952
+      ],
+      "id": "f83a00ce-43d4-5ed5-9ad3-b4510b6c427b",
+      "name": "Add data to SHORT",
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "55cbdc40-1REDACTED2d-4560-a2cf-2REDACTED12e7e653bd",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -48,
+        880
+      ],
+      "id": "b9a6049b-774d-5868-a405-c813c633ea84",
+      "name": "Webhook",
+      "webhookId": "55cbdc40-182d-4560-a2cf-2812e7e653bd"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_001",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 242242777,
+          "mode": "list",
+          "cachedResultName": "Manual",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_001/edit#gid=242242777"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Actions": "Manual run",
+            "Status": "=Started at {{$now.format('yyyy-MM-dd hh:mm')}}"
+          },
+          "matchingColumns": [
+            "Actions"
+          ],
+          "schema": [
+            {
+              "id": "Actions",
+              "displayName": "Actions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "locationDefine": {
+            "values": {
+              "headerRow": 7,
+              "firstDataRow": 8
+            }
+          },
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        512,
+        368
+      ],
+      "id": "3494b0d2-23c7-54b3-a0d8-411207428058",
+      "name": "Status Started",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID_001",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 242242777,
+          "mode": "list",
+          "cachedResultName": "Manual",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID_001/edit#gid=242242777"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Actions": "Manual run",
+            "Status": "=Done at {{$now.format('yyyy-MM-dd hh:mm')}}"
+          },
+          "matchingColumns": [
+            "Actions"
+          ],
+          "schema": [
+            {
+              "id": "Actions",
+              "displayName": "Actions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "locationDefine": {
+            "values": {
+              "headerRow": 7,
+              "firstDataRow": 8
+            }
+          },
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4464,
+        1984
+      ],
+      "id": "62c4e507-a575-5634-8a3b-576ac58c7875",
+      "name": "Status Done",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "nREDACTEDn Api Sheets"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call 'People directory to DWH'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Call 'People directory to DWH'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "read pplaccess",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Short": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "read pplaccess": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Add all data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Truncate data": {
+      "main": [
+        [
+          {
+            "node": "Read from DONE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add data to ops.ppl_access": {
+      "main": [
+        [
+          {
+            "node": "Read from TO DO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add data to ops.ppl_access1": {
+      "main": [
+        [
+          {
+            "node": "Create ops.ppl_access_cross_data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create ops.ppl_access_cross_data": {
+      "main": [
+        [
+          {
+            "node": "Case New person",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Case New person": {
+      "main": [
+        [
+          {
+            "node": "Case No change",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get data from dwh": {
+      "main": [
+        []
+      ]
+    },
+    "Case No change": {
+      "main": [
+        [
+          {
+            "node": "Case Add Grant access",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Case Add Grant access": {
+      "main": [
+        [
+          {
+            "node": "Case Grant or Revoke update required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Case Grant or Revoke update required": {
+      "main": [
+        [
+          {
+            "node": "Add new Offboarded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add new Offboarded": {
+      "main": [
+        [
+          {
+            "node": "Add old Offboarded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add old Offboarded": {
+      "main": [
+        [
+          {
+            "node": "Clear DONE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'People directory to DWH'": {
+      "main": [
+        [
+          {
+            "node": "Truncate data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Status Started",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read people access rules matrix from PD": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read people access rules matrix test": {
+      "main": [
+        [
+          {
+            "node": "Read people access rules matrix from PD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Add data to ops.ppl_access1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get data from dwh1": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Filter2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Filter3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear DONE": {
+      "main": [
+        [
+          {
+            "node": "Clear TO DO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear TO DO": {
+      "main": [
+        [
+          {
+            "node": "Clear TO DO1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Add data to TO DO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter2": {
+      "main": [
+        [
+          {
+            "node": "Add data to DONE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read from DONE": {
+      "main": [
+        [
+          {
+            "node": "Add data to ops.ppl_access",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read from TO DO": {
+      "main": [
+        [
+          {
+            "node": "Add data to ops.ppl_access2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add data to ops.ppl_access2": {
+      "main": [
+        [
+          {
+            "node": "Read people access rules matrix test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter3": {
+      "main": [
+        [
+          {
+            "node": "Add data to SHORT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear TO DO1": {
+      "main": [
+        [
+          {
+            "node": "Get data from dwh1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Call 'People directory to DWH'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add data to SHORT": {
+      "main": [
+        [
+          {
+            "node": "Status Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "REDACTED",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REDACTED_INSTANCE_ID"
+  },
+  "nodeGroups": [],
+  "id": "REDACTED",
+  "tags": []
+}
