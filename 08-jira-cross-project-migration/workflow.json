@@ -1,0 +1,622 @@
+{
+  "name": "Copy task in Jira projects",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "options": {
+          "jql": "issue = PRJA-126"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        224
+      ],
+      "id": "0c24baeb-e4a0-5be6-97a3-9a41ffdca3b7",
+      "name": "Get many issues",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -256,
+        224
+      ],
+      "id": "1ee5b11c-76de-5876-b672-3842ba9a0863",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10001",
+          "mode": "list",
+          "cachedResultName": "PRJB : Project B Support "
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "={{ $json.fields.issuetype.id }}",
+          "mode": "id"
+        },
+        "summary": "=[{{ $json.key }}] {{ $json.fields.summary }}",
+        "additionalFields": {
+          "description": "={{ $json.fields.description }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        192,
+        288
+      ],
+      "id": "aa94aec1-7b79-5e5a-87b4-005da2c8b4eb",
+      "name": "Create an issue",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        224
+      ],
+      "id": "a529a3c6-70fc-5532-9acf-bb30456266b1",
+      "name": "Epic copy"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "options": {
+          "jql": "issue = PRJA-141"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        480,
+        96
+      ],
+      "id": "73c7d2a6-48b8-5d92-a844-4ce723f47264",
+      "name": "Get many issues1",
+      "executeOnce": true,
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        816,
+        96
+      ],
+      "id": "c339bdc9-1bd5-5c25-8f6a-11460d6f1f2a",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10001",
+          "mode": "list",
+          "cachedResultName": "PRJB : Project B Support "
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "={{ $json.fields.issuetype.id }}",
+          "mode": "id"
+        },
+        "summary": "=[{{ $json.key }}] {{ $json.fields.summary }}",
+        "additionalFields": {
+          "customFieldsUi": {
+            "customFieldsValues": [
+              {
+                "fieldId": {
+                  "__rl": true,
+                  "value": "customfield_10014",
+                  "mode": "list",
+                  "cachedResultName": "Epic Link"
+                },
+                "fieldValue": "={{ $json.newParentKey ? $json.newParentKey : undefined }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        160
+      ],
+      "id": "2dd30a55-047f-513e-b646-fe0b9d5bf0fc",
+      "name": "Create an issue1",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "options": {
+          "jql": "project = \"PRJB\" AND issuetype = Epic"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        288,
+        80
+      ],
+      "id": "202e5d43-4b8a-5f98-ae07-2b1420f21607",
+      "name": "Fetch New Epics",
+      "executeOnce": true,
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const epics = $('Fetch New Epics').all();\n\nreturn $input.all().map(task => {\n    // 1. Ищем старый ключ эпика (например, PSL-1 или INGR03-10)\n    let oldKey = task.json.fields?.customfield_10014 || task.json.fields?.parent?.key || \"\";\n    task.json.newParentKey = \"\"; \n\n    if (oldKey) {\n        // 2. Пытаемся найти новый скопированный Эпик по скобкам\n        let matchedEpic = epics.find(e => {\n            const summaryText = e.json.fields?.summary || \"\";\n            return summaryText.includes(`[${oldKey}]`);\n        });\n        \n        if (matchedEpic) {\n            // 3. Если нашли (это внутренний Эпик) — отдаем новый ключ (например, INGR03UN-20)\n            task.json.newParentKey = matchedEpic.json.key;\n        } else {\n            // 4. ВОТ ОНО! Если НЕ нашли (это внешний Эпик, как PSL-1) — отдаем старый ключ!\n            task.json.newParentKey = oldKey;\n        }\n    }\n    return task;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        96
+      ],
+      "id": "2be9f76b-ac3c-5578-9944-00cefdbd51c6",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "options": {
+          "jql": "project = \"PRJD\" AND issuetype != Sub-task"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        1312,
+        -96
+      ],
+      "id": "fbcc2e06-ad83-5bf5-ada6-48ec3799a5a0",
+      "name": "Fetch New Tasks",
+      "executeOnce": true,
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "options": {
+          "jql": "project = \"PRJC\" AND issuetype in subTaskIssueTypes() AND worklogDate >= \"2026-01-01\" AND worklogDate <= \"2026-05-31\""
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        1536,
+        -128
+      ],
+      "id": "e023ba59-c4f1-5ac7-81fd-561900d4af3f",
+      "name": "Fetch Old Subtasks",
+      "executeOnce": true,
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Grab the new Phase 2 tasks from your target project (INCB01UN)\nconst newTasks = $('Fetch New Tasks').all();\n\n// 2. Map through source Sub-tasks (INCB01) and find their new parents\nreturn $input.all().map(subtask => {\n    let oldKey = subtask.json.fields?.parent?.key || \"\";\n    subtask.json.newParentKey = \"\";\n\n    if (oldKey) {\n        let matchedParent = newTasks.find(t => {\n            const summaryText = t.json.fields?.summary || \"\";\n            return summaryText.includes(`[${oldKey}]`) || summaryText.includes(oldKey);\n        });\n        \n        if (matchedParent) {\n            subtask.json.newParentKey = matchedParent.json.key;\n        }\n    }\n    return subtask;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        -112
+      ],
+      "id": "7b1cc0a1-a877-56fe-b158-a06077844d7f",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1968,
+        -112
+      ],
+      "id": "61dcc4d3-505d-58e2-8814-21d56fbedc2a",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "1319REDACTED",
+          "mode": "list",
+          "cachedResultName": "PRJD : Project D Support"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "={{ $json.fields.issuetype.id }}",
+          "mode": "id"
+        },
+        "summary": "=[{{ $json.key }}] {{ $json.fields.summary }}",
+        "additionalFields": {
+          "parentIssueKey": "={{ $json.newParentKey }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        2416,
+        -32
+      ],
+      "id": "86c8ae93-c6da-5bfd-a650-dd8760f92f8e",
+      "name": "Create Subtask",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "REDACTED",
+          "name": "Jira Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        128,
+        96
+      ],
+      "id": "ee547537-91e5-5fd0-966f-38a3cc81b138",
+      "name": "Wait",
+      "webhookId": "a7e35893-dcc5-46d9-a333-e69590662355"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1056,
+        160
+      ],
+      "id": "54f974d1-d10c-537f-a057-52170c8ebf6e",
+      "name": "Wait1",
+      "webhookId": "ea7fa141-493a-4de0-8670-2de8ee16bc36"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2176,
+        -16
+      ],
+      "id": "b5c95981-4301-5a91-b772-9a7364ce93a0",
+      "name": "Wait2",
+      "webhookId": "5eccbc7a-aec1-43b0-8039-9f600f573d49"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1056,
+        -64
+      ],
+      "id": "512400ad-e0d4-575c-898d-12e2c8d698e7",
+      "name": "Wait3",
+      "webhookId": "5dc58c7f-5209-459c-8a6b-5c30edb445d6"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -48,
+        320
+      ],
+      "id": "8e0b3d56-c3f4-5df9-8dd0-81483a686a69",
+      "name": "Wait4",
+      "webhookId": "1add13cf-ab58-4fd8-a02d-6d6866989270"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get many issues": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an issue": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Epic copy": {
+      "main": [
+        [
+          {
+            "node": "Get many issues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many issues1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an issue1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch New Epics": {
+      "main": [
+        [
+          {
+            "node": "Get many issues1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch New Tasks": {
+      "main": [
+        [
+          {
+            "node": "Fetch Old Subtasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Old Subtasks": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Subtask": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Fetch New Epics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Create an issue1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Create Subtask",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Fetch New Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "Create an issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "REDACTED",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REDACTED_INSTANCE_ID"
+  },
+  "nodeGroups": [],
+  "id": "REDACTED",
+  "tags": []
+}
